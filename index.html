@@ -156,6 +156,34 @@
           <p><strong>🅱 人机协作。</strong>在独立集多项式的下界证明中，Aletheia 反而提供了"大局观"——高层策略和关键思路，人类数学家负责严格化执行。通常我们以为 AI 是干活的，人类掌舵，但这次反过来了。</p>
           <p><strong>🅲 Erdős 猜想大规模扫描。</strong>700 道 Erdős 开放问题，Aletheia 返回 212 个候选解，其中 63 个技术上正确，但只有 13 个真正有意义地回答了问题（6.5%）。4 道是真正的自主新解。大量"正确但无意义"的答案暴露了 AI 的一个本质弱点：<strong>规约博弈</strong>——它倾向于把问题重新解释成最容易回答的版本。</p>
 
+          <p style="margin-top:0.8rem"><strong>推理时 Scaling Law：算力换智力的极限在哪？</strong></p>
+          <p>论文展示了一组很有说服力的数据。Deep Think 利用"并行思考"探索多条思路，推理算力可以灵活调节。在 IMO-ProofBench（30 道 IMO 难度题）上，随着算力增加数个数量级，准确率稳步上升直到趋于饱和。2026 年 1 月的新版 Deep Think 比 2025 年 7 月的 IMO 金牌版本效率提升了约 100 倍——达到同等水平所需的算力降低了两个数量级。</p>
+          <p>但到了 PhD 级别的 FutureMath 基准测试，同样的 scaling law 依然成立，准确率却显著低于竞赛题。这说明 scaling 有用但不够——推理算力的瓶颈不是"想得不够久"，而是"知道的不够多"。</p>
+
+          <p style="margin-top:0.8rem"><strong>工具使用：从编造论文到断章取义</strong></p>
+          <p>没有搜索能力时，模型会编造完全不存在的论文（虚构标题、虚构作者）。加入 Google Search 和网页浏览后，这类低级幻觉大幅减少，但出现了更精致的错误：引用的论文确实存在，但论文里的结论被错误转述。论文里举了一个具体例子——模型引用了 Galambos 1976 年的论文，但声称的"经典结果"在那篇论文中根本找不到。</p>
+          <p>有意思的是，Python 代码执行工具对减少计算错误只有微弱帮助。论文推测 Gemini 在这些计算任务上的基线能力已经很高，标准代码执行不够用，可能需要更专业的工具。</p>
+
+          <p style="margin-top:0.8rem"><strong>消融实验：Aletheia vs 裸 Deep Think</strong></p>
+          <p>在 Aletheia 成功解决的 13 道 Erdős 题上，裸 Deep Think（IMO 金牌级别，相同基座模型）只解出了 8 道，而且用了大约 2 倍的平均算力。在研究论文相关的 prompt 上，Deep Think 能复现 [FYZ4] 的结果，但在 [Feng2026] 的三个 prompt 上全部失败。对于 [ACGKMP]，Deep Think 找到了一个上界，但不如 Aletheia 的结果精确。这验证了验证-修正机制的价值——不只是"试更多次"，而是"知道什么时候该换方向"。</p>
+
+          <p style="margin-top:0.8rem"><strong>Erdős 问题的完整数据</strong></p>
+          <p>700 道开放问题 → 212 个候选解（Aletheia 自己过滤掉了 488 个） → 200 个能明确判对错的 → 63 个技术正确（31.5%） → 但只有 13 个真正有意义（6.5%）。这 13 个分四类：</p>
+          <p>• <strong>自主新解（2 道）</strong>：Erdős-652、Erdős-1051，AI 找到了第一个已知正确解</p>
+          <p>• <strong>部分解决（2 道）</strong>：Erdős-654、Erdős-1040，多问题中解决了部分</p>
+          <p>• <strong>独立重新发现（4 道）</strong>：Erdős-397、659、935、1089，解是对的，但后来发现文献中已有。其中 Erdős-397（1980 年提出）竟然和 2012 年中国 IMO 选拔赛的一道题几乎一样</p>
+          <p>• <strong>文献定位（5 道）</strong>：Erdős-333、591、705、992、1105，AI 发现这些"开放问题"其实已经在文献中被解决了</p>
+          <p>剩下 50 道"技术正确但无意义"的答案暴露了 specification gaming：模型把问题重新解释成最容易回答的版本，给出了"正确但没人想要"的答案。</p>
+
+          <p style="margin-top:0.8rem"><strong>自主数学研究分级体系</strong></p>
+          <p>论文提出了一个二维分类法，类比自动驾驶的 SAE 分级：</p>
+          <p>• <strong>X 轴——自主程度</strong>：Level H（主要人类，AI 辅助）→ Level C（人机协作）→ Level A（基本自主）</p>
+          <p>• <strong>Y 轴——数学意义</strong>：Level 0（可忽略）→ Level 1（轻微新颖）→ Level 2（可发表）→ Level 3（重大进展）→ Level 4（里程碑突破，如费马大定理、庞加莱猜想级别）</p>
+          <p>他们把自己的成果标注为：Erdős 自主解 = A0/A1，[Feng2026] = A2，[LeeSeo2026] = C2，[ACGKMP] = H2。Level 2 的范围刻意很宽，涵盖大多数人类数学论文，这样就不用在人类成果之间做主观比较。</p>
+
+          <p style="margin-top:0.8rem"><strong>Human-AI Interaction Card</strong></p>
+          <p>论文还提出了"人机交互卡片"（HAI Card），记录每篇论文中人和 AI 的具体互动。比如 [Feng2026] 的卡片很简洁：人类提问"计算 Type A 的特征权"→ Aletheia 给出完整正确解 → 人类继续问 Type C → 正确 → 问 Type D → 正确。三轮对话，零人类修正。所有原始 prompt 和输出都公开在 GitHub 上。</p>
+
           <p style="margin-top:0.8rem"><strong>我的几点思考</strong></p>
 
           <p>🔸 <strong>验证比生成更有价值。</strong>Aletheia 最大的进步不是"想得更深"，而是"知道自己错了"。它会主动承认无法解决某个问题，这在人机协作中极其关键。比起一个自信满满但经常胡说的系统，一个会说"我不确定"的系统有用得多。</p>
