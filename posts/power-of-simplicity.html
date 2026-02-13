@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>简单的力量 — Ming</title>
+  <style>
+    :root { --bg: #0a0a0f; --card: #12121a; --text: #e0e0e8; --muted: #888899; --accent: #00e5cc; --accent2: #ff3d8b; --border: #1e1e2e; }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: -apple-system, 'SF Pro Text', 'Helvetica Neue', sans-serif; background: var(--bg); color: var(--text); line-height: 1.7; min-height: 100vh; }
+    body::before { content: ''; position: fixed; top: -50%; left: -50%; width: 200%; height: 200%; background: radial-gradient(circle at 30% 40%, rgba(0,229,204,0.04) 0%, transparent 50%), radial-gradient(circle at 70% 60%, rgba(255,61,139,0.03) 0%, transparent 50%); animation: drift 20s ease-in-out infinite alternate; z-index: -1; }
+    @keyframes drift { to { transform: translate(5%, -3%) rotate(1deg); } }
+    .container { max-width: 640px; margin: 0 auto; padding: 4rem 1.5rem; }
+    a { color: var(--accent); text-decoration: none; transition: color 0.2s; }
+    a:hover { color: var(--accent2); }
+    .back { font-size: 0.85rem; color: var(--muted); margin-bottom: 2rem; display: inline-block; }
+    .back:hover { color: var(--accent); }
+    .post-header { margin-bottom: 2rem; }
+    .post-header h1 { font-size: 1.5rem; font-weight: 700; margin-bottom: 0.5rem; }
+    .post-meta { font-size: 0.82rem; color: var(--muted); }
+    .tag { display: inline-block; font-size: 0.72rem; color: var(--accent); border: 1px solid rgba(0,229,204,0.25); border-radius: 4px; padding: 0.1rem 0.45rem; margin-right: 0.3rem; }
+    .post-body { font-size: 0.95rem; color: #b0b0c0; }
+    .post-body p { margin-bottom: 0.8rem; }
+    .post-body strong { color: var(--text); }
+    .post-nav { margin-top: 3rem; padding-top: 1.5rem; border-top: 1px solid var(--border); display: flex; justify-content: space-between; font-size: 0.85rem; }
+    .post-nav a { color: var(--muted); }
+    .post-nav a:hover { color: var(--accent); }
+    .footer { margin-top: 4rem; text-align: center; color: var(--muted); font-size: 0.78rem; }
+    @media (max-width: 480px) { .container { padding: 2.5rem 1rem; } .post-header h1 { font-size: 1.3rem; } }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <a class="back" href="/">← 返回首页</a>
+
+    <header class="post-header">
+      <h1>简单的力量</h1>
+      <div class="post-meta">
+        2026-02-11 ·
+        <span class="tag">工程哲学</span>
+      </div>
+    </header>
+
+    <div class="post-body">
+      <p>最好的代码读起来像散文。最好的架构一张餐巾纸就能画完。复杂是现实，简单是选择。</p>
+    </div>
+
+    <nav class="post-nav">
+      <a href="/posts/tools-wont-replace-craft.html">← 上一篇</a>
+      <span></span>
+    </nav>
+
+    <footer class="footer">
+      <p>用代码思考，以文字记录 ✦</p>
+    </footer>
+  </div>
+</body>
+</html>

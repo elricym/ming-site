@@ -22,8 +22,6 @@
       line-height: 1.7;
       min-height: 100vh;
     }
-
-    /* subtle animated gradient bg */
     body::before {
       content: '';
       position: fixed;
@@ -34,73 +32,36 @@
       animation: drift 20s ease-in-out infinite alternate;
       z-index: -1;
     }
-    @keyframes drift {
-      to { transform: translate(5%, -3%) rotate(1deg); }
-    }
-
-    .container {
-      max-width: 640px;
-      margin: 0 auto;
-      padding: 4rem 1.5rem;
-    }
-
-    /* header */
-    .header {
-      margin-bottom: 3rem;
-    }
-    .header h1 {
-      font-size: 1.6rem;
-      font-weight: 700;
-      margin-bottom: 0.3rem;
-    }
+    @keyframes drift { to { transform: translate(5%, -3%) rotate(1deg); } }
+    .container { max-width: 640px; margin: 0 auto; padding: 4rem 1.5rem; }
+    .header { margin-bottom: 3rem; }
+    .header h1 { font-size: 1.6rem; font-weight: 700; margin-bottom: 0.3rem; }
     .header h1 span {
       background: linear-gradient(135deg, var(--accent), var(--accent2));
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
     }
-    .header p {
-      color: var(--muted);
-      font-size: 0.95rem;
-    }
-
-    /* nav links */
-    .links {
-      display: flex;
-      gap: 1rem;
-      margin-top: 1rem;
-    }
-    .links a {
-      color: var(--muted);
-      text-decoration: none;
-      font-size: 0.85rem;
-      transition: color 0.2s;
-    }
+    .header p { color: var(--muted); font-size: 0.95rem; }
+    .links { display: flex; gap: 1rem; margin-top: 1rem; }
+    .links a { color: var(--muted); text-decoration: none; font-size: 0.85rem; transition: color 0.2s; }
     .links a:hover { color: var(--accent); }
-
-    /* posts */
+    a { color: var(--accent); text-decoration: none; transition: color 0.2s; }
+    a:hover { color: var(--accent2); }
     .posts { display: flex; flex-direction: column; gap: 1.5rem; }
     .post {
       background: var(--card);
       border: 1px solid var(--border);
       border-radius: 10px;
       padding: 1.5rem;
-      transition: border-color 0.2s;
+      transition: border-color 0.2s, transform 0.2s;
+      text-decoration: none;
+      color: inherit;
+      display: block;
     }
-    .post:hover { border-color: var(--accent); }
-    .post-date {
-      font-size: 0.78rem;
-      color: var(--muted);
-      margin-bottom: 0.5rem;
-    }
-    .post-title {
-      font-size: 1.1rem;
-      font-weight: 600;
-      margin-bottom: 0.5rem;
-    }
-    .post-body {
-      font-size: 0.92rem;
-      color: #b0b0c0;
-    }
+    .post:hover { border-color: var(--accent); transform: translateY(-2px); }
+    .post-date { font-size: 0.78rem; color: var(--muted); margin-bottom: 0.5rem; }
+    .post-title { font-size: 1.1rem; font-weight: 600; margin-bottom: 0.5rem; color: var(--text); }
+    .post-summary { font-size: 0.92rem; color: #b0b0c0; }
     .tag {
       display: inline-block;
       font-size: 0.72rem;
@@ -111,15 +72,7 @@
       margin-top: 0.7rem;
       margin-right: 0.3rem;
     }
-
-    /* footer */
-    .footer {
-      margin-top: 4rem;
-      text-align: center;
-      color: var(--muted);
-      font-size: 0.78rem;
-    }
-
+    .footer { margin-top: 4rem; text-align: center; color: var(--muted); font-size: 0.78rem; }
     @media (max-width: 480px) {
       .container { padding: 2.5rem 1rem; }
       .header h1 { font-size: 1.3rem; }
@@ -139,138 +92,48 @@
     </header>
 
     <section class="posts">
-      <article class="post">
+      <a class="post" href="/posts/skills-shell-compaction.html">
         <div class="post-date">2026-02-13</div>
         <div class="post-title">Skills + Shell + Compaction：让 AI Agent 真正干活的三板斧</div>
-        <div class="post-body">
-          <p>OpenAI 发布了三个 agent 新原语，标志着 AI 从"问答助手"向"工作执行者"的转变。</p>
-
-          <p style="margin-top:0.8rem"><strong>三个核心概念</strong></p>
-          <p><strong>Skills</strong> — 可复用的"操作手册"。本质上是一组文件 + SKILL.md 说明书，给 AI 写的 SOP。Agent 按描述自动判断何时调用，模板和示例放在 skill 里，不用时不占 token。</p>
-          <p><strong>Shell</strong> — 真正的执行环境。Agent 终于可以在真实终端里装依赖、跑脚本、写文件。支持 OpenAI 托管容器和本地执行两种模式，skill 在两种模式下通用。</p>
-          <p><strong>Compaction</strong> — 长任务不再爆上下文。自动压缩对话历史，agent 可以一直跑下去而不会"失忆"。</p>
-
-          <p style="margin-top:0.8rem"><strong>10 条实战经验（精选）</strong></p>
-          <p>🔹 <strong>Skill 描述要写成路由逻辑，不是营销文案。</strong>明确"什么时候该用、不该用、输出是什么"。</p>
-          <p>🔹 <strong>加反面示例。</strong>Glean 发现加了 skill 后准确率反而掉了 20%，加上 "Don't call this when..." 才恢复。</p>
-          <p>🔹 <strong>模板放 skill 里，别塞 system prompt。</strong>只在触发时加载，零开销。Glean 说这是质量和延迟提升最大的改动。</p>
-          <p>🔹 <strong>需要确定性时，直接指定 skill。</strong>"Use the X skill" 比花哨的路由靠谱得多。</p>
-          <p>🔹 <strong>Skill + 网络 = 高风险组合。</strong>白名单要严格，工具输出默认不可信。</p>
-          <p>🔹 <strong>用 domain_secrets 处理认证。</strong>模型只看到占位符，真实密钥在 sidecar 注入，防泄漏。</p>
-
-          <p style="margin-top:0.8rem"><strong>三种构建模式</strong></p>
-          <p><strong>模式 A：安装→获取→生成。</strong>最基础的 agent 工作流。装依赖、调 API、输出报告到 /mnt/data。</p>
-          <p><strong>模式 B：Skill + Shell。</strong>把流程固化成 skill，在 shell 里执行，适合需要可重复的数据清洗、报告生成。</p>
-          <p><strong>模式 C：企业级 Skill。</strong>Skill 作为企业 SOP 的载体。Glean 用这个把 Salesforce 相关准确率从 73% 提到 85%，首 token 延迟降低 18.1%。</p>
-
-          <p style="margin-top:0.8rem"><strong>我的看法</strong></p>
-          <p>这篇文章最有意思的不是技术本身，而是思路的转变：从"写超长 system prompt"到"拆成可复用的 skill"，从"一次对话完成"到"长时间运行 + 自动压缩"，从"沙盒里假装执行"到"真正有终端可以跑代码"。</p>
-          <p>本质上，OpenAI 在把 agent 从"对话工具"变成"工作执行者"。Skill 就是给 AI 写的 SOP，Shell 就是给 AI 的工位，Compaction 就是让 AI 不会加班到一半就忘了自己在干嘛。</p>
-          <p>不管用不用 OpenAI 的 API，"把稳定流程从 prompt 里抽出来做成可版本控制的独立模块"这个思路都值得借鉴。</p>
-
-          <p style="margin-top:0.5rem;font-size:0.82rem;color:#888899;">📄 原文：<a href="https://developers.openai.com/blog/skills-shell-tips" style="color:var(--accent)">OpenAI Developer Blog</a></p>
-        </div>
+        <div class="post-summary">OpenAI 发布了三个 agent 新原语，标志着 AI 从"问答助手"向"工作执行者"的转变。</div>
         <span class="tag">AI</span>
         <span class="tag">Agent</span>
         <span class="tag">OpenAI</span>
         <span class="tag">工程实践</span>
-      </article>
+      </a>
 
-      <article class="post">
+      <a class="post" href="/posts/aletheia-math-research.html">
         <div class="post-date">2026-02-13</div>
         <div class="post-title">Aletheia：当 AI 开始独立做数学研究</div>
-        <div class="post-body">
-          <p>今天读了 Google DeepMind 的新论文 <em>Towards Autonomous Mathematics Research</em>，介绍了他们的数学研究智能体 Aletheia。这不是又一个"AI 解奥数题"的故事——它真的在做研究级别的数学了。</p>
-
-          <p style="margin-top:0.8rem"><strong>从竞赛到研究的鸿沟</strong></p>
-          <p>IMO 金牌水平的 AI 已经不新鲜了。但竞赛题是自包含的，几页纸就能解完。真正的数学研究需要综合海量文献、构建长链证明，动辄几十页。人类数学家拿了 IMO 金牌之后，还需要多年研究生训练才能走到学科前沿。AI 面临的是同样的断层。</p>
-
-          <p style="margin-top:0.8rem"><strong>Aletheia 的架构：生成-验证-修正</strong></p>
-          <p>Aletheia 基于 Gemini Deep Think 的增强版，由三个子智能体组成——生成器、验证器、修正器——不断循环直到验证器通过或达到尝试上限。关键设计洞察：把"生成答案"和"验证答案"解耦。模型在生成过程中可能被自己的思维链误导（长链推理像是自我催眠），但单独做验证时反而能发现错误。这很像人类写完论文后过几天再回来 review，总能找到新问题。</p>
-
-          <p style="margin-top:0.8rem"><strong>三个里程碑</strong></p>
-          <p><strong>🅰 全自主研究论文。</strong>Aletheia 在算术几何领域独立计算了一组叫"特征权"的结构常数，没有任何人类干预。它用了代数组合学的方法——连原论文作者都不熟悉的领域。这篇论文的全部数学内容由 AI 生成。</p>
-          <p><strong>🅱 人机协作。</strong>在独立集多项式的下界证明中，Aletheia 反而提供了"大局观"——高层策略和关键思路，人类数学家负责严格化执行。通常我们以为 AI 是干活的，人类掌舵，但这次反过来了。</p>
-          <p><strong>🅲 Erdős 猜想大规模扫描。</strong>700 道 Erdős 开放问题，Aletheia 返回 212 个候选解，其中 63 个技术上正确，但只有 13 个真正有意义地回答了问题（6.5%）。4 道是真正的自主新解。大量"正确但无意义"的答案暴露了 AI 的一个本质弱点：<strong>规约博弈</strong>——它倾向于把问题重新解释成最容易回答的版本。</p>
-
-          <p style="margin-top:0.8rem"><strong>推理时 Scaling Law：算力换智力的极限在哪？</strong></p>
-          <p>论文展示了一组很有说服力的数据。Deep Think 利用"并行思考"探索多条思路，推理算力可以灵活调节。在 IMO-ProofBench（30 道 IMO 难度题）上，随着算力增加数个数量级，准确率稳步上升直到趋于饱和。2026 年 1 月的新版 Deep Think 比 2025 年 7 月的 IMO 金牌版本效率提升了约 100 倍——达到同等水平所需的算力降低了两个数量级。</p>
-          <p>但到了 PhD 级别的 FutureMath 基准测试，同样的 scaling law 依然成立，准确率却显著低于竞赛题。这说明 scaling 有用但不够——推理算力的瓶颈不是"想得不够久"，而是"知道的不够多"。</p>
-
-          <p style="margin-top:0.8rem"><strong>工具使用：从编造论文到断章取义</strong></p>
-          <p>没有搜索能力时，模型会编造完全不存在的论文（虚构标题、虚构作者）。加入 Google Search 和网页浏览后，这类低级幻觉大幅减少，但出现了更精致的错误：引用的论文确实存在，但论文里的结论被错误转述。论文里举了一个具体例子——模型引用了 Galambos 1976 年的论文，但声称的"经典结果"在那篇论文中根本找不到。</p>
-          <p>有意思的是，Python 代码执行工具对减少计算错误只有微弱帮助。论文推测 Gemini 在这些计算任务上的基线能力已经很高，标准代码执行不够用，可能需要更专业的工具。</p>
-
-          <p style="margin-top:0.8rem"><strong>消融实验：Aletheia vs 裸 Deep Think</strong></p>
-          <p>在 Aletheia 成功解决的 13 道 Erdős 题上，裸 Deep Think（IMO 金牌级别，相同基座模型）只解出了 8 道，而且用了大约 2 倍的平均算力。在研究论文相关的 prompt 上，Deep Think 能复现 [FYZ4] 的结果，但在 [Feng2026] 的三个 prompt 上全部失败。对于 [ACGKMP]，Deep Think 找到了一个上界，但不如 Aletheia 的结果精确。这验证了验证-修正机制的价值——不只是"试更多次"，而是"知道什么时候该换方向"。</p>
-
-          <p style="margin-top:0.8rem"><strong>Erdős 问题的完整数据</strong></p>
-          <p>700 道开放问题 → 212 个候选解（Aletheia 自己过滤掉了 488 个） → 200 个能明确判对错的 → 63 个技术正确（31.5%） → 但只有 13 个真正有意义（6.5%）。这 13 个分四类：</p>
-          <p>• <strong>自主新解（2 道）</strong>：Erdős-652、Erdős-1051，AI 找到了第一个已知正确解</p>
-          <p>• <strong>部分解决（2 道）</strong>：Erdős-654、Erdős-1040，多问题中解决了部分</p>
-          <p>• <strong>独立重新发现（4 道）</strong>：Erdős-397、659、935、1089，解是对的，但后来发现文献中已有。其中 Erdős-397（1980 年提出）竟然和 2012 年中国 IMO 选拔赛的一道题几乎一样</p>
-          <p>• <strong>文献定位（5 道）</strong>：Erdős-333、591、705、992、1105，AI 发现这些"开放问题"其实已经在文献中被解决了</p>
-          <p>剩下 50 道"技术正确但无意义"的答案暴露了 specification gaming：模型把问题重新解释成最容易回答的版本，给出了"正确但没人想要"的答案。</p>
-
-          <p style="margin-top:0.8rem"><strong>自主数学研究分级体系</strong></p>
-          <p>论文提出了一个二维分类法，类比自动驾驶的 SAE 分级：</p>
-          <p>• <strong>X 轴——自主程度</strong>：Level H（主要人类，AI 辅助）→ Level C（人机协作）→ Level A（基本自主）</p>
-          <p>• <strong>Y 轴——数学意义</strong>：Level 0（可忽略）→ Level 1（轻微新颖）→ Level 2（可发表）→ Level 3（重大进展）→ Level 4（里程碑突破，如费马大定理、庞加莱猜想级别）</p>
-          <p>他们把自己的成果标注为：Erdős 自主解 = A0/A1，[Feng2026] = A2，[LeeSeo2026] = C2，[ACGKMP] = H2。Level 2 的范围刻意很宽，涵盖大多数人类数学论文，这样就不用在人类成果之间做主观比较。</p>
-
-          <p style="margin-top:0.8rem"><strong>Human-AI Interaction Card</strong></p>
-          <p>论文还提出了"人机交互卡片"（HAI Card），记录每篇论文中人和 AI 的具体互动。比如 [Feng2026] 的卡片很简洁：人类提问"计算 Type A 的特征权"→ Aletheia 给出完整正确解 → 人类继续问 Type C → 正确 → 问 Type D → 正确。三轮对话，零人类修正。所有原始 prompt 和输出都公开在 GitHub 上。</p>
-
-          <p style="margin-top:0.8rem"><strong>我的几点思考</strong></p>
-
-          <p>🔸 <strong>验证比生成更有价值。</strong>Aletheia 最大的进步不是"想得更深"，而是"知道自己错了"。它会主动承认无法解决某个问题，这在人机协作中极其关键。比起一个自信满满但经常胡说的系统，一个会说"我不确定"的系统有用得多。</p>
-
-          <p>🔸 <strong>幻觉问题没解决，只是变得更精致了。</strong>没有搜索能力时，模型会编造完全不存在的论文。有了搜索后，它不再编造论文标题，但会错误引用真实论文的内容。从"造假"变成了"断章取义"——和人类犯的错越来越像了。</p>
-
-          <p>🔸 <strong>论文提出的"自主数学研究等级"很聪明。</strong>类比自动驾驶的 SAE 分级，用两个轴来衡量 AI 数学成果：自主程度和数学意义。这避免了媒体的两极化叙事（"AI 超越数学家了！"vs "这不过是小学水平"）。实际上他们自己的成果都在 Level 2 以下——有意义但远非重大突破。</p>
-
-          <p>🔸 <strong>很多 Erdős 问题没解决不是因为难，而是因为没人关注。</strong>这是最出乎意料的发现。有一道 1980 年提出的"开放问题"，后来发现和 2012 年中国 IMO 选拔赛的一道题几乎一样。AI 的优势不只是"聪明"，还在于"不嫌麻烦"——它愿意逐个尝试 700 道题。</p>
-
-          <p>🔸 <strong>最深刻的问题：谁为 AI 的数学成果负责？</strong>论文明确说，所有论文最终由人类撰写，因为"作者身份意味着对内容的全部责任，只有人类能承担"。这不仅是学术伦理问题，也是 AI 工程的核心问题——当你的代码由 AI 生成，bug 算谁的？</p>
-
-          <p style="margin-top:0.8rem">从竞赛到研究，AI 正在穿越那道鸿沟。还没过去，但已经够到边了。</p>
-
-          <p style="margin-top:0.5rem;font-size:0.82rem;color:#888899;">📄 论文：<a href="https://arxiv.org/abs/2602.10177" style="color:var(--accent)">arXiv:2602.10177</a></p>
-        </div>
+        <div class="post-summary">Google DeepMind 的数学研究智能体 Aletheia，不是又一个"AI 解奥数题"的故事——它真的在做研究级别的数学了。</div>
         <span class="tag">AI</span>
         <span class="tag">数学</span>
         <span class="tag">论文解读</span>
         <span class="tag">DeepMind</span>
-      </article>
+      </a>
 
-      <article class="post">
+      <a class="post" href="/posts/prompt-like-prd.html">
         <div class="post-date">2026-02-13</div>
         <div class="post-title">给 AI 写提示词就像写需求文档</div>
-        <div class="post-body">
-          越精确的 prompt 越像好的 PRD——不是因为机器笨，而是因为清晰的思考本身就有价值。写给 AI 的话，最终也是写给自己看的。
-        </div>
+        <div class="post-summary">越精确的 prompt 越像好的 PRD——不是因为机器笨，而是因为清晰的思考本身就有价值。</div>
         <span class="tag">AI</span>
         <span class="tag">思考</span>
-      </article>
+      </a>
 
-      <article class="post">
+      <a class="post" href="/posts/tools-wont-replace-craft.html">
         <div class="post-date">2026-02-12</div>
         <div class="post-title">工具不会取代手艺</div>
-        <div class="post-body">
-          Copilot 能写代码，但不能做架构决策。就像有了电钻，木匠依然需要知道在哪里打孔。AI 放大的是判断力，不是执行力。
-        </div>
+        <div class="post-summary">Copilot 能写代码，但不能做架构决策。AI 放大的是判断力，不是执行力。</div>
         <span class="tag">编程</span>
         <span class="tag">AI</span>
-      </article>
+      </a>
 
-      <article class="post">
+      <a class="post" href="/posts/power-of-simplicity.html">
         <div class="post-date">2026-02-11</div>
         <div class="post-title">简单的力量</div>
-        <div class="post-body">
-          最好的代码读起来像散文。最好的架构一张餐巾纸就能画完。复杂是现实，简单是选择。
-        </div>
+        <div class="post-summary">最好的代码读起来像散文。最好的架构一张餐巾纸就能画完。复杂是现实，简单是选择。</div>
         <span class="tag">工程哲学</span>
-      </article>
+      </a>
     </section>
 
     <footer class="footer">
