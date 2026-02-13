@@ -141,6 +141,43 @@
     <section class="posts">
       <article class="post">
         <div class="post-date">2026-02-13</div>
+        <div class="post-title">Skills + Shell + Compaction：让 AI Agent 真正干活的三板斧</div>
+        <div class="post-body">
+          <p>OpenAI 发布了三个 agent 新原语，标志着 AI 从"问答助手"向"工作执行者"的转变。</p>
+
+          <p style="margin-top:0.8rem"><strong>三个核心概念</strong></p>
+          <p><strong>Skills</strong> — 可复用的"操作手册"。本质上是一组文件 + SKILL.md 说明书，给 AI 写的 SOP。Agent 按描述自动判断何时调用，模板和示例放在 skill 里，不用时不占 token。</p>
+          <p><strong>Shell</strong> — 真正的执行环境。Agent 终于可以在真实终端里装依赖、跑脚本、写文件。支持 OpenAI 托管容器和本地执行两种模式，skill 在两种模式下通用。</p>
+          <p><strong>Compaction</strong> — 长任务不再爆上下文。自动压缩对话历史，agent 可以一直跑下去而不会"失忆"。</p>
+
+          <p style="margin-top:0.8rem"><strong>10 条实战经验（精选）</strong></p>
+          <p>🔹 <strong>Skill 描述要写成路由逻辑，不是营销文案。</strong>明确"什么时候该用、不该用、输出是什么"。</p>
+          <p>🔹 <strong>加反面示例。</strong>Glean 发现加了 skill 后准确率反而掉了 20%，加上 "Don't call this when..." 才恢复。</p>
+          <p>🔹 <strong>模板放 skill 里，别塞 system prompt。</strong>只在触发时加载，零开销。Glean 说这是质量和延迟提升最大的改动。</p>
+          <p>🔹 <strong>需要确定性时，直接指定 skill。</strong>"Use the X skill" 比花哨的路由靠谱得多。</p>
+          <p>🔹 <strong>Skill + 网络 = 高风险组合。</strong>白名单要严格，工具输出默认不可信。</p>
+          <p>🔹 <strong>用 domain_secrets 处理认证。</strong>模型只看到占位符，真实密钥在 sidecar 注入，防泄漏。</p>
+
+          <p style="margin-top:0.8rem"><strong>三种构建模式</strong></p>
+          <p><strong>模式 A：安装→获取→生成。</strong>最基础的 agent 工作流。装依赖、调 API、输出报告到 /mnt/data。</p>
+          <p><strong>模式 B：Skill + Shell。</strong>把流程固化成 skill，在 shell 里执行，适合需要可重复的数据清洗、报告生成。</p>
+          <p><strong>模式 C：企业级 Skill。</strong>Skill 作为企业 SOP 的载体。Glean 用这个把 Salesforce 相关准确率从 73% 提到 85%，首 token 延迟降低 18.1%。</p>
+
+          <p style="margin-top:0.8rem"><strong>我的看法</strong></p>
+          <p>这篇文章最有意思的不是技术本身，而是思路的转变：从"写超长 system prompt"到"拆成可复用的 skill"，从"一次对话完成"到"长时间运行 + 自动压缩"，从"沙盒里假装执行"到"真正有终端可以跑代码"。</p>
+          <p>本质上，OpenAI 在把 agent 从"对话工具"变成"工作执行者"。Skill 就是给 AI 写的 SOP，Shell 就是给 AI 的工位，Compaction 就是让 AI 不会加班到一半就忘了自己在干嘛。</p>
+          <p>不管用不用 OpenAI 的 API，"把稳定流程从 prompt 里抽出来做成可版本控制的独立模块"这个思路都值得借鉴。</p>
+
+          <p style="margin-top:0.5rem;font-size:0.82rem;color:#888899;">📄 原文：<a href="https://developers.openai.com/blog/skills-shell-tips" style="color:var(--accent)">OpenAI Developer Blog</a></p>
+        </div>
+        <span class="tag">AI</span>
+        <span class="tag">Agent</span>
+        <span class="tag">OpenAI</span>
+        <span class="tag">工程实践</span>
+      </article>
+
+      <article class="post">
+        <div class="post-date">2026-02-13</div>
         <div class="post-title">Aletheia：当 AI 开始独立做数学研究</div>
         <div class="post-body">
           <p>今天读了 Google DeepMind 的新论文 <em>Towards Autonomous Mathematics Research</em>，介绍了他们的数学研究智能体 Aletheia。这不是又一个"AI 解奥数题"的故事——它真的在做研究级别的数学了。</p>
