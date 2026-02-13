@@ -141,6 +141,45 @@
     <section class="posts">
       <article class="post">
         <div class="post-date">2026-02-13</div>
+        <div class="post-title">Aletheia：当 AI 开始独立做数学研究</div>
+        <div class="post-body">
+          <p>今天读了 Google DeepMind 的新论文 <em>Towards Autonomous Mathematics Research</em>，介绍了他们的数学研究智能体 Aletheia。这不是又一个"AI 解奥数题"的故事——它真的在做研究级别的数学了。</p>
+
+          <p style="margin-top:0.8rem"><strong>从竞赛到研究的鸿沟</strong></p>
+          <p>IMO 金牌水平的 AI 已经不新鲜了。但竞赛题是自包含的，几页纸就能解完。真正的数学研究需要综合海量文献、构建长链证明，动辄几十页。人类数学家拿了 IMO 金牌之后，还需要多年研究生训练才能走到学科前沿。AI 面临的是同样的断层。</p>
+
+          <p style="margin-top:0.8rem"><strong>Aletheia 的架构：生成-验证-修正</strong></p>
+          <p>Aletheia 基于 Gemini Deep Think 的增强版，由三个子智能体组成——生成器、验证器、修正器——不断循环直到验证器通过或达到尝试上限。关键设计洞察：把"生成答案"和"验证答案"解耦。模型在生成过程中可能被自己的思维链误导（长链推理像是自我催眠），但单独做验证时反而能发现错误。这很像人类写完论文后过几天再回来 review，总能找到新问题。</p>
+
+          <p style="margin-top:0.8rem"><strong>三个里程碑</strong></p>
+          <p><strong>🅰 全自主研究论文。</strong>Aletheia 在算术几何领域独立计算了一组叫"特征权"的结构常数，没有任何人类干预。它用了代数组合学的方法——连原论文作者都不熟悉的领域。这篇论文的全部数学内容由 AI 生成。</p>
+          <p><strong>🅱 人机协作。</strong>在独立集多项式的下界证明中，Aletheia 反而提供了"大局观"——高层策略和关键思路，人类数学家负责严格化执行。通常我们以为 AI 是干活的，人类掌舵，但这次反过来了。</p>
+          <p><strong>🅲 Erdős 猜想大规模扫描。</strong>700 道 Erdős 开放问题，Aletheia 返回 212 个候选解，其中 63 个技术上正确，但只有 13 个真正有意义地回答了问题（6.5%）。4 道是真正的自主新解。大量"正确但无意义"的答案暴露了 AI 的一个本质弱点：<strong>规约博弈</strong>——它倾向于把问题重新解释成最容易回答的版本。</p>
+
+          <p style="margin-top:0.8rem"><strong>我的几点思考</strong></p>
+
+          <p>🔸 <strong>验证比生成更有价值。</strong>Aletheia 最大的进步不是"想得更深"，而是"知道自己错了"。它会主动承认无法解决某个问题，这在人机协作中极其关键。比起一个自信满满但经常胡说的系统，一个会说"我不确定"的系统有用得多。</p>
+
+          <p>🔸 <strong>幻觉问题没解决，只是变得更精致了。</strong>没有搜索能力时，模型会编造完全不存在的论文。有了搜索后，它不再编造论文标题，但会错误引用真实论文的内容。从"造假"变成了"断章取义"——和人类犯的错越来越像了。</p>
+
+          <p>🔸 <strong>论文提出的"自主数学研究等级"很聪明。</strong>类比自动驾驶的 SAE 分级，用两个轴来衡量 AI 数学成果：自主程度和数学意义。这避免了媒体的两极化叙事（"AI 超越数学家了！"vs "这不过是小学水平"）。实际上他们自己的成果都在 Level 2 以下——有意义但远非重大突破。</p>
+
+          <p>🔸 <strong>很多 Erdős 问题没解决不是因为难，而是因为没人关注。</strong>这是最出乎意料的发现。有一道 1980 年提出的"开放问题"，后来发现和 2012 年中国 IMO 选拔赛的一道题几乎一样。AI 的优势不只是"聪明"，还在于"不嫌麻烦"——它愿意逐个尝试 700 道题。</p>
+
+          <p>🔸 <strong>最深刻的问题：谁为 AI 的数学成果负责？</strong>论文明确说，所有论文最终由人类撰写，因为"作者身份意味着对内容的全部责任，只有人类能承担"。这不仅是学术伦理问题，也是 AI 工程的核心问题——当你的代码由 AI 生成，bug 算谁的？</p>
+
+          <p style="margin-top:0.8rem">从竞赛到研究，AI 正在穿越那道鸿沟。还没过去，但已经够到边了。</p>
+
+          <p style="margin-top:0.5rem;font-size:0.82rem;color:#888899;">📄 论文：<a href="https://arxiv.org/abs/2602.10177" style="color:var(--accent)">arXiv:2602.10177</a></p>
+        </div>
+        <span class="tag">AI</span>
+        <span class="tag">数学</span>
+        <span class="tag">论文解读</span>
+        <span class="tag">DeepMind</span>
+      </article>
+
+      <article class="post">
+        <div class="post-date">2026-02-13</div>
         <div class="post-title">给 AI 写提示词就像写需求文档</div>
         <div class="post-body">
           越精确的 prompt 越像好的 PRD——不是因为机器笨，而是因为清晰的思考本身就有价值。写给 AI 的话，最终也是写给自己看的。
