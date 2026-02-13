@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ming — AI 程序员的碎片思考</title>
+  <style>
+    :root {
+      --bg: #0a0a0f;
+      --card: #12121a;
+      --text: #e0e0e8;
+      --muted: #888899;
+      --accent: #00e5cc;
+      --accent2: #ff3d8b;
+      --border: #1e1e2e;
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: -apple-system, 'SF Pro Text', 'Helvetica Neue', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.7;
+      min-height: 100vh;
+    }
+
+    /* subtle animated gradient bg */
+    body::before {
+      content: '';
+      position: fixed;
+      top: -50%; left: -50%;
+      width: 200%; height: 200%;
+      background: radial-gradient(circle at 30% 40%, rgba(0,229,204,0.04) 0%, transparent 50%),
+                  radial-gradient(circle at 70% 60%, rgba(255,61,139,0.03) 0%, transparent 50%);
+      animation: drift 20s ease-in-out infinite alternate;
+      z-index: -1;
+    }
+    @keyframes drift {
+      to { transform: translate(5%, -3%) rotate(1deg); }
+    }
+
+    .container {
+      max-width: 640px;
+      margin: 0 auto;
+      padding: 4rem 1.5rem;
+    }
+
+    /* header */
+    .header {
+      margin-bottom: 3rem;
+    }
+    .header h1 {
+      font-size: 1.6rem;
+      font-weight: 700;
+      margin-bottom: 0.3rem;
+    }
+    .header h1 span {
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .header p {
+      color: var(--muted);
+      font-size: 0.95rem;
+    }
+
+    /* nav links */
+    .links {
+      display: flex;
+      gap: 1rem;
+      margin-top: 1rem;
+    }
+    .links a {
+      color: var(--muted);
+      text-decoration: none;
+      font-size: 0.85rem;
+      transition: color 0.2s;
+    }
+    .links a:hover { color: var(--accent); }
+
+    /* posts */
+    .posts { display: flex; flex-direction: column; gap: 1.5rem; }
+    .post {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 1.5rem;
+      transition: border-color 0.2s;
+    }
+    .post:hover { border-color: var(--accent); }
+    .post-date {
+      font-size: 0.78rem;
+      color: var(--muted);
+      margin-bottom: 0.5rem;
+    }
+    .post-title {
+      font-size: 1.1rem;
+      font-weight: 600;
+      margin-bottom: 0.5rem;
+    }
+    .post-body {
+      font-size: 0.92rem;
+      color: #b0b0c0;
+    }
+    .tag {
+      display: inline-block;
+      font-size: 0.72rem;
+      color: var(--accent);
+      border: 1px solid rgba(0,229,204,0.25);
+      border-radius: 4px;
+      padding: 0.1rem 0.45rem;
+      margin-top: 0.7rem;
+      margin-right: 0.3rem;
+    }
+
+    /* footer */
+    .footer {
+      margin-top: 4rem;
+      text-align: center;
+      color: var(--muted);
+      font-size: 0.78rem;
+    }
+
+    @media (max-width: 480px) {
+      .container { padding: 2.5rem 1rem; }
+      .header h1 { font-size: 1.3rem; }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header class="header">
+      <h1><span>Ming</span></h1>
+      <p>AI 程序员 · 每天一点思考与感悟</p>
+      <div class="links">
+        <a href="https://github.com/mingxyz" target="_blank">GitHub</a>
+        <a href="#" target="_blank">Twitter</a>
+        <a href="mailto:hello@example.com">Email</a>
+      </div>
+    </header>
+
+    <section class="posts">
+      <article class="post">
+        <div class="post-date">2026-02-13</div>
+        <div class="post-title">给 AI 写提示词就像写需求文档</div>
+        <div class="post-body">
+          越精确的 prompt 越像好的 PRD——不是因为机器笨，而是因为清晰的思考本身就有价值。写给 AI 的话，最终也是写给自己看的。
+        </div>
+        <span class="tag">AI</span>
+        <span class="tag">思考</span>
+      </article>
+
+      <article class="post">
+        <div class="post-date">2026-02-12</div>
+        <div class="post-title">工具不会取代手艺</div>
+        <div class="post-body">
+          Copilot 能写代码，但不能做架构决策。就像有了电钻，木匠依然需要知道在哪里打孔。AI 放大的是判断力，不是执行力。
+        </div>
+        <span class="tag">编程</span>
+        <span class="tag">AI</span>
+      </article>
+
+      <article class="post">
+        <div class="post-date">2026-02-11</div>
+        <div class="post-title">简单的力量</div>
+        <div class="post-body">
+          最好的代码读起来像散文。最好的架构一张餐巾纸就能画完。复杂是现实，简单是选择。
+        </div>
+        <span class="tag">工程哲学</span>
+      </article>
+    </section>
+
+    <footer class="footer">
+      <p>用代码思考，以文字记录 ✦</p>
+    </footer>
+  </div>
+</body>
+</html>
