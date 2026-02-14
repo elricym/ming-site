@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>极简 Coding Agent 的哲学：从 Pi 学到的设计智慧 — Ming</title>
+  <style>
+    :root { --bg: #0a0a0f; --card: #12121a; --text: #e0e0e8; --muted: #888899; --accent: #00e5cc; --accent2: #ff3d8b; --border: #1e1e2e; }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: -apple-system, 'SF Pro Text', 'Helvetica Neue', sans-serif; background: var(--bg); color: var(--text); line-height: 1.7; min-height: 100vh; }
+    body::before { content: ''; position: fixed; top: -50%; left: -50%; width: 200%; height: 200%; background: radial-gradient(circle at 30% 40%, rgba(0,229,204,0.04) 0%, transparent 50%), radial-gradient(circle at 70% 60%, rgba(255,61,139,0.03) 0%, transparent 50%); animation: drift 20s ease-in-out infinite alternate; z-index: -1; }
+    @keyframes drift { to { transform: translate(5%, -3%) rotate(1deg); } }
+    .container { max-width: 640px; margin: 0 auto; padding: 4rem 1.5rem; }
+    a { color: var(--accent); text-decoration: none; transition: color 0.2s; }
+    a:hover { color: var(--accent2); }
+    .back { font-size: 0.85rem; color: var(--muted); margin-bottom: 2rem; display: inline-block; }
+    .back:hover { color: var(--accent); }
+    .post-header { margin-bottom: 2rem; }
+    .post-header h1 { font-size: 1.5rem; font-weight: 700; margin-bottom: 0.5rem; }
+    .post-meta { font-size: 0.82rem; color: var(--muted); }
+    .tag { display: inline-block; font-size: 0.72rem; color: var(--accent); border: 1px solid rgba(0,229,204,0.25); border-radius: 4px; padding: 0.1rem 0.45rem; margin-right: 0.3rem; }
+    .post-body { font-size: 0.95rem; color: #b0b0c0; }
+    .post-body p { margin-bottom: 0.8rem; }
+    .post-body strong { color: var(--text); }
+    .post-body h2 { color: var(--text); font-size: 1.2rem; margin: 2rem 0 0.8rem; padding-bottom: 0.3rem; border-bottom: 1px solid var(--border); }
+    .post-body h3 { color: var(--text); font-size: 1.05rem; margin: 1.5rem 0 0.6rem; }
+    .post-body ul, .post-body ol { margin: 0.5rem 0 1rem 1.5rem; }
+    .post-body li { margin-bottom: 0.4rem; }
+    .post-body blockquote { border-left: 3px solid var(--accent); padding-left: 1rem; margin: 1rem 0; color: var(--muted); font-style: italic; }
+    .post-body code { background: rgba(0,229,204,0.08); padding: 0.15rem 0.4rem; border-radius: 3px; font-size: 0.88rem; color: var(--accent); }
+    .post-nav { margin-top: 3rem; padding-top: 1.5rem; border-top: 1px solid var(--border); display: flex; justify-content: space-between; font-size: 0.85rem; }
+    .post-nav a { color: var(--muted); }
+    .post-nav a:hover { color: var(--accent); }
+    .footer { margin-top: 4rem; text-align: center; color: var(--muted); font-size: 0.78rem; }
+    @media (max-width: 480px) { .container { padding: 2.5rem 1rem; } .post-header h1 { font-size: 1.3rem; } }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <a class="back" href="/">← 返回首页</a>
+    <header class="post-header">
+      <h1>极简 Coding Agent 的哲学：从 Pi 学到的设计智慧</h1>
+      <div class="post-meta">2026-02-14 · 阅读笔记</div>
+      <span class="tag">AI</span>
+      <span class="tag">Agent</span>
+      <span class="tag">Coding</span>
+    </header>
+
+    <article class="post-body">
+      <p>Mario Zechner（libGDX 作者）写了一篇关于他自己造的极简 coding agent <strong>Pi</strong> 的长文。这个项目的哲学和技术选择非常有启发性，值得每个做 AI agent 的人认真学习。</p>
+      <p>原文：<a href="https://mariozechner.at/posts/2025-11-30-pi-coding-agent/" target="_blank">What I learned building an opinionated and minimal coding agent</a></p>
+
+      <h2>为什么要自己造？</h2>
+      <p>Mario 用了三年 LLM 辅助编码，从 ChatGPT → Copilot → Cursor → Claude Code，最终觉得 Claude Code 变得太臃肿——80% 的功能他用不上，system prompt 和工具定义每次更新都变，破坏工作流。他想要的很简单：<strong>完全掌控上下文、完全可观测、极简</strong>。</p>
+
+      <h2>架构：四个包解决一切</h2>
+      <ul>
+        <li><strong>pi-ai</strong> — 统一 LLM API，支持 Anthropic/OpenAI/Google/xAI/Groq 等全部主流 provider，带跨 provider 无缝上下文切换</li>
+        <li><strong>pi-agent-core</strong> — 极简 agent loop，工具执行 + 事件流</li>
+        <li><strong>pi-tui</strong> — 自研 TUI 框架，差异渲染 + 同步输出，几乎无闪烁</li>
+        <li><strong>pi-coding-agent</strong> — 最终 CLI，会话管理 + 主题 + 项目上下文</li>
+      </ul>
+
+      <h2>七个反直觉的设计决策</h2>
+
+      <h3>1. System Prompt &lt; 1000 tokens</h3>
+      <p>对比 Claude Code 上万 token 的 system prompt，Pi 只用了极简指令。结论：<strong>前沿模型已被 RL 训练得足够理解 coding agent，不需要冗长的 prompt。</strong>在 Terminal-Bench 2.0 上的跑分证明了这一点。</p>
+
+      <h3>2. 只有 4 个工具</h3>
+      <p><code>read</code>, <code>write</code>, <code>edit</code>, <code>bash</code> —— 就这四个。模型天生会用它们。Pi 的 system prompt + tool definitions 加起来不到 1000 tokens。对比 Claude Code 的几十个工具定义……</p>
+
+      <h3>3. 默认 YOLO 模式</h3>
+      <p>没有权限确认，没有安全检查。Mario 的理由很直白：<strong>当 agent 能写代码 + 跑代码 + 联网，所有安全措施本质上都是"安全剧场"。</strong>大家实际用的时候都在 YOLO 模式，不如直接承认。</p>
+
+      <h3>4. 不要内置 TODO</h3>
+      <p>内置 TODO 列表只会增加模型的认知负担和出错机会。直接用 <code>TODO.md</code> 文件更好——可见、可控、跨会话持久。</p>
+
+      <h3>5. 不要 MCP</h3>
+      <p>MCP server 动辄消耗 13-18K token 的上下文（Playwright MCP 21 个工具 13.7K，Chrome DevTools MCP 26 个工具 18K）。替代方案：<strong>写 CLI 工具 + README，agent 按需读取</strong>，token 成本只在需要时支付。</p>
+
+      <h3>6. 不要后台 bash</h3>
+      <p>用 <strong>tmux</strong> 代替。完全可观测，还能人机共享终端协作调试。</p>
+
+      <h3>7. 不要 sub-agent</h3>
+      <p>Sub-agent 是黑箱中的黑箱——你看不到它做了什么，上下文传递质量也差。更重要的是：</p>
+      <blockquote>使用 sub-agent 收集上下文是错误的思路。如果你需要收集上下文，先在独立 session 里做，生成一个 artifact，再在新 session 里用它。</blockquote>
+
+      <h2>关于上下文工程</h2>
+      <p>Mario 最精辟的观察：</p>
+      <blockquote>Twitter 上到处都是 context engineering 的帖子和博客，但没有一个现有 harness 真正让你做 context engineering。</blockquote>
+      <p>他还指出一个被低估的问题：<strong>模型被训练成只读文件的一部分而非全文</strong>，所以它们会错过重要上下文。这意味着我们太信任 agent 了——看看 Pi 的 issue tracker，很多 AI 生成的 PR 因为缺乏完整理解而被关闭。</p>
+
+      <h2>Benchmark 结果</h2>
+      <p>在 Terminal-Bench 2.0 上，Pi + Claude Opus 4.5 的成绩排名前列，和那些工具复杂得多的 agent（Codex、Cursor、Windsurf）不相上下。这个结果很有说服力——<strong>极简不等于弱</strong>。</p>
+      <p>值得注意的是 Terminus 2（Terminal-Bench 团队自己的极简 agent，只给模型一个 tmux session）也表现不错。它没有任何花哨工具，只有原始终端交互。</p>
+
+      <h2>我的思考</h2>
+      <p>这篇文章最大的启发不是具体的技术选择，而是一种思维方式：<strong>先问"真的需要吗？"</strong></p>
+      <p>很多 agent 框架在做加法——更多工具、更多 prompt、更多功能。但 Pi 证明了减法同样有效，甚至更有效。因为：</p>
+      <ul>
+        <li>更少的工具 = 更少的上下文消耗 = 更多空间给真正重要的内容</li>
+        <li>更简的 prompt = 模型更少困惑 = 更可预测的行为</li>
+        <li>更透明的架构 = 更好的可观测性 = 更容易调试和优化</li>
+      </ul>
+      <p>这也呼应了我之前写的 <a href="/posts/power-of-simplicity.html">简单的力量</a>——在 AI agent 时代，简单依然是最强大的设计原则。</p>
+    </article>
+
+    <nav class="post-nav">
+      <a href="/posts/skills-shell-compaction.html">← Skills + Shell + Compaction</a>
+      <span></span>
+    </nav>
+
+    <footer class="footer">© 2026 Ming · 用 AI 写代码的人</footer>
+  </div>
+</body>
+</html>
