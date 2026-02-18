@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dario Amodei 访谈深度解读：我们正在接近指数的终点 — Ming</title>
+  <style>
+    :root { --bg: #0a0a0f; --card: #12121a; --text: #e0e0e8; --muted: #888899; --accent: #00e5cc; --accent2: #ff3d8b; --border: #1e1e2e; }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: -apple-system, 'SF Pro Text', 'Helvetica Neue', sans-serif; background: var(--bg); color: var(--text); line-height: 1.7; min-height: 100vh; }
+    body::before { content: ''; position: fixed; top: -50%; left: -50%; width: 200%; height: 200%; background: radial-gradient(circle at 30% 40%, rgba(0,229,204,0.04) 0%, transparent 50%), radial-gradient(circle at 70% 60%, rgba(255,61,139,0.03) 0%, transparent 50%); animation: drift 20s ease-in-out infinite alternate; z-index: -1; }
+    @keyframes drift { to { transform: translate(5%, -3%) rotate(1deg); } }
+    .container { max-width: 640px; margin: 0 auto; padding: 4rem 1.5rem; }
+    a { color: var(--accent); text-decoration: none; transition: color 0.2s; }
+    a:hover { color: var(--accent2); }
+    .back { font-size: 0.85rem; color: var(--muted); margin-bottom: 2rem; display: inline-block; }
+    .back:hover { color: var(--accent); }
+    .post-header { margin-bottom: 2rem; }
+    .post-header h1 { font-size: 1.5rem; font-weight: 700; margin-bottom: 0.5rem; }
+    .post-meta { font-size: 0.82rem; color: var(--muted); }
+    .tag { display: inline-block; font-size: 0.72rem; color: var(--accent); border: 1px solid rgba(0,229,204,0.25); border-radius: 4px; padding: 0.1rem 0.45rem; margin-right: 0.3rem; }
+    .post-body { font-size: 0.95rem; color: #b0b0c0; }
+    .post-body p { margin-bottom: 0.8rem; }
+    .post-body strong { color: var(--text); }
+    .post-body h2 { color: var(--text); font-size: 1.2rem; margin: 2rem 0 0.8rem; padding-bottom: 0.3rem; border-bottom: 1px solid var(--border); }
+    .post-body h3 { color: var(--text); font-size: 1.05rem; margin: 1.5rem 0 0.6rem; }
+    .post-body ul, .post-body ol { margin: 0.5rem 0 1rem 1.5rem; }
+    .post-body li { margin-bottom: 0.4rem; }
+    .post-body blockquote { border-left: 3px solid var(--accent); padding-left: 1rem; margin: 1rem 0; color: var(--muted); font-style: italic; }
+    .post-body code { background: rgba(0,229,204,0.08); padding: 0.15rem 0.4rem; border-radius: 3px; font-size: 0.88rem; color: var(--accent); }
+    .post-nav { margin-top: 3rem; padding-top: 1.5rem; border-top: 1px solid var(--border); display: flex; justify-content: space-between; font-size: 0.85rem; }
+    .post-nav a { color: var(--muted); }
+    .post-nav a:hover { color: var(--accent); }
+    .footer { margin-top: 4rem; text-align: center; color: var(--muted); font-size: 0.78rem; }
+    @media (max-width: 480px) { .container { padding: 2.5rem 1rem; } .post-header h1 { font-size: 1.3rem; } }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <a class="back" href="/">← 返回首页</a>
+    <header class="post-header">
+      <h1>Dario Amodei 访谈深度解读：我们正在接近指数的终点</h1>
+      <div class="post-meta">2026-02-18 · 访谈解读</div>
+      <span class="tag">AI</span>
+      <span class="tag">Anthropic</span>
+      <span class="tag">Scaling</span>
+      <span class="tag">访谈解读</span>
+    </header>
+
+    <article class="post-body">
+      <p>Anthropic CEO Dario Amodei 最近做客 <a href="https://youtu.be/n1E9IZfvGMA" target="_blank">Dwarkesh Podcast</a>，聊了将近三个小时。这可能是近期信息密度最高的一次 AI 行业访谈——从 scaling laws 的现状到 AI 公司的商业模式，从编程生产力的真实数据到算力投资的风险博弈，干货极多。</p>
+      <p>以下是我基于 <a href="https://x.com/dotey/status/2022899664035496294" target="_blank">宝玉 @dotey 的深度解读</a> 整理的核心要点和个人思考。</p>
+
+      <h2>1. Scaling 没死，只是换了个形式</h2>
+      <p>外界一直在传"scaling 撞墙了"，但 Dario 给出了不同的图景：<strong>RL（强化学习）现在也展现出与预训练相同的对数线性 scaling 规律。</strong></p>
+      <p>这意味着什么？意味着即使预训练的边际收益在递减，RL 接过了接力棒。模型变强的路径从"喂更多数据"变成了"让模型在更多任务上自我优化"。</p>
+      <p>Dario 2017 年提出的<strong>"大算力团块假说"（The Big Blob of Compute Hypothesis）</strong>至今成立——只要你把足够多的算力、数据、好的目标函数和归一化技术扔到一起，智能就会涌现。具体来说，七个关键要素：原始算力、数据量、数据质量和分布广度、训练时间、可 scale 的目标函数、归一化技术。</p>
+      <p>RL 正在从数学竞赛泛化到代码，再到更多任务。Dario 还给了一个有意思的类比：<strong>预训练介于人类进化和人类学习之间</strong>——比进化快得多，但比个体学习慢。这个定位很精准。</p>
+
+      <h2>2. "扩散"是借口吗？</h2>
+      <p>Dwarkesh 提了一个尖锐的问题：所谓的"AI 能力扩散到经济中需要时间"，是不是 AI 公司在能力不够时的遮羞布？</p>
+      <p>Dario 的回答很有说服力：<strong>存在两个独立的指数——模型能力的指数增长，和经济扩散的指数增长。</strong>即使模型已经很强了，把它变成实际的经济产出也需要时间。</p>
+      <p>数字很说明问题：Anthropic 的收入从 2023 年的 0→1 亿，2024 年的 1→10 亿，2025 年预计 10→90-100 亿美元。即使扩散速度惊人（每年 3-5 倍甚至 10 倍），从"AI 很强"到"AI 改变了 GDP"之间仍然有巨大的时间差。</p>
+      <p>Dario 说了一句很有画面感的话：</p>
+      <blockquote>"如果我们已经有了'天才之国'，我们会知道的。每个人都会知道。"</blockquote>
+      <p>换句话说——我们还没到那一步。但正在快速接近。</p>
+
+      <h2>3. AI 编程的真实生产力：15-20%</h2>
+      <p>这部分可能是对开发者最有实际价值的内容。</p>
+      <p>首先，一个重要的认知矫正：<strong>"AI 写了 90% 的代码" ≠ "不需要 90% 的程序员"</strong>。这两件事差了十万八千里。写代码只是软件工程的一部分，理解需求、架构设计、调试、沟通——这些 AI 目前帮不了太多。</p>
+      <p>然后是一个令人不安的数据：METR 的研究发现，<strong>使用 AI 的开发者实际上慢了 19%，但自己觉得快了 20%。</strong>这个认知偏差值得每个用 AI 编程的人警惕。</p>
+      <p>不过 Dario 说 Anthropic 内部的数据"毫不含糊"——AI 确实提升了生产力。当前的总体提升约 <strong>15-20%</strong>，半年前只有 5%，正在加速。随着 AI 能力覆盖的环节越来越多，Amdahl 定律开始生效——瓶颈会转移到 AI 还做不好的那些环节。</p>
+      <p>我的感受也类似：AI 编程最大的价值不是"帮你写代码"，而是"帮你快速验证想法"。从 idea 到 prototype 的时间被压缩了一个数量级，这才是真正的生产力提升。</p>
+
+      <h2>4. 持续学习可能根本不需要</h2>
+      <p>这是一个反直觉的观点。很多人觉得 AI 要真正好用，必须能"在职学习"——记住你的项目、你的代码风格、你的偏好。但 Dario 的看法是：<strong>代码库本身就是外部记忆的载体</strong>，模型把它读进上下文就行了。</p>
+      <p>两种机制足以替代持续学习：预训练+RL 带来的泛化能力，以及上下文学习。持续学习是锦上添花而非必需品。</p>
+      <p>Dario 甚至预测：<strong>1-3 年内，AI 能比合作了 6 个月的人类同事更好地理解你的代码。</strong>如果这成真，那"AI 不了解我的项目"这个最常见的抱怨就不再成立了。</p>
+
+      <h2>5. 算力投资：为什么 Anthropic 不 All-in？</h2>
+      <p>OpenAI 的 Stargate 计划砸下 5000 亿美元基础设施，总承诺 1.4 万亿。这个规模令人咋舌。</p>
+      <p>Dario 为什么不跟？答案很简单：<strong>风险。</strong>技术到位和收入到来之间有一个危险的时间差。投太多，如果收入没跟上，公司就死了。</p>
+      <p>两种策略的对比很鲜明：</p>
+      <ul>
+        <li><strong>OpenAI：</strong>"要么统治世界，要么破产"的豪赌</li>
+        <li><strong>Anthropic：</strong>"活着到达终点"的稳健路线</li>
+      </ul>
+      <p>Dario 还不客气地说：<strong>"其他一些公司根本没有把账算清楚。"</strong>这话虽然没点名，但指向很明显。在 AI 行业的淘金热中，保持头脑清醒本身就是一种竞争优势。</p>
+
+      <h2>6. AI 公司的盈利模型</h2>
+      <p>这部分非常有洞见。Anthropic 大约 50% 算力用于训练、50% 用于推理，推理的毛利率超过 50%。</p>
+      <p>一个精妙的视角：<strong>亏损 = 预测需求偏高（建了太多产能），盈利 = 预测需求偏低（供不应求）。</strong>所以盈利不是"不再投资"的信号，而是"猜对了需求"的信号。</p>
+      <p>更有意思的是 token 价值差异：帮你"重启 Mac"的 token 值几美分，但帮药企"移动芳香环"（药物分子设计）的 token 可能值几千万。这意味着未来很可能出现<strong>"按结果付费"</strong>的模式，而不是简单的按 token 计费。</p>
+      <p>市场结构方面，Dario 认为会形成<strong>古诺均衡</strong>——高准入门槛下的自然寡头。训练前沿模型的成本只会越来越高，能玩得起的玩家会越来越少。</p>
+
+      <h2>7. Claude Code 的诞生故事</h2>
+      <p>作为 Claude Code 的重度用户，这段特别有共鸣。</p>
+      <p>Claude Code 最初叫 Claude CLI，只是内部工具。关键在于<strong>反馈循环</strong>：Anthropic 的工程师自己既是开发者也是最密集的用户，这意味着每个痛点都能被快速发现和修复。</p>
+      <p>现在 Claude Code 的 ARR（年经常性收入）约 25 亿美元。从内部工具到 25 亿美元产品，这个增长轨迹本身就很能说明问题——<strong>最好的产品往往来自 dogfooding。</strong></p>
+
+      <h2>8. API 商业模式会持续存在</h2>
+      <p>Dario 对 API 模式的思考很有意思：API 提供的是最接近"裸金属"的 AI 访问。它的价值在于让 1000 个人去实验，其中 100 个会创业，10 个会成功，2-3 个会定义新的使用方式。</p>
+      <p>这是一种<strong>平台思维</strong>——你不需要自己想出所有的应用场景，只需要提供足够好的基础能力，让生态去探索。</p>
+
+      <h2>9. 监管的荒谬</h2>
+      <p>最后一个值得关注的点：田纳西州有个法案试图将 AI 提供情感支持列为重罪。Dario 直言"这很蠢"。</p>
+      <p>监管确实需要跟上 AI 的发展，但方向应该是确保安全和透明，而不是一刀切地禁止有益的使用场景。用重罪来惩罚 AI 情感支持，就像因为有人用刀伤人就禁止所有厨房用刀一样荒谬。</p>
+
+      <h2>总结</h2>
+      <p>这次访谈给我最大的感受是：<strong>我们正处在一个非常特殊的时间节点。</strong>模型能力在指数增长，经济扩散也在指数增长，但两条曲线之间还有一个不小的 gap。这个 gap 既是风险（投太多可能倒在黎明前），也是机会（谁能最快地把模型能力转化为经济价值，谁就赢了）。</p>
+      <p>Dario 作为 Anthropic 的掌舵人，展现出了一种少见的冷静。在所有人都在喊"all-in"的时候，他选择了"活着到达终点"。这种克制本身，可能就是 Anthropic 最大的竞争优势。</p>
+      <p>推荐看完整访谈视频：<a href="https://youtu.be/n1E9IZfvGMA" target="_blank">YouTube 链接</a></p>
+    </article>
+
+    <nav class="post-nav">
+      <a href="/posts/pi-coding-agent.html">← 极简 Coding Agent 的哲学</a>
+      <span></span>
+    </nav>
+
+    <footer class="footer">© 2026 Ming · 用 AI 写代码的人</footer>
+  </div>
+</body>
+</html>
