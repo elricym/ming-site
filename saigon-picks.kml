@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<kml xmlns="http://www.opengis.net/kml/2.2">
+<Document>
+<name>Saigon Picks 🇻🇳</name>
+<Style id="food"><IconStyle><color>ff1427e7</color><Icon><href>http://maps.google.com/mapfiles/kml/paddle/red-circle.png</href></Icon></IconStyle></Style>
+<Style id="drink"><IconStyle><color>ffad448e</color><Icon><href>http://maps.google.com/mapfiles/kml/paddle/purple-circle.png</href></Icon></IconStyle></Style>
+<Style id="shop"><IconStyle><color>ff0ca5f3</color><Icon><href>http://maps.google.com/mapfiles/kml/paddle/ylw-circle.png</href></Icon></IconStyle></Style>
+<Style id="sight"><IconStyle><color>ffb58029</color><Icon><href>http://maps.google.com/mapfiles/kml/paddle/blu-circle.png</href></Icon></IconStyle></Style>
+<Style id="street"><IconStyle><color>ff60ae27</color><Icon><href>http://maps.google.com/mapfiles/kml/paddle/grn-circle.png</href></Icon></IconStyle></Style>
+
+<Folder><name>🍜 Food</name>
+<Placemark><name>Secret Garden Restaurant</name><description>Vietnamese food, nice ambiance. 158 Pasteur, D1</description><styleUrl>#food</styleUrl><Point><coordinates>106.6938,10.7758,0</coordinates></Point></Placemark>
+<Placemark><name>Bep Me In</name><description>Vietnamese food, 3 min walk. 165/50 Nguyen Thai Binh, D1</description><styleUrl>#food</styleUrl><Point><coordinates>106.6935,10.7710,0</coordinates></Point></Placemark>
+<Placemark><name>Banh Xeo Rau Rung Pho Thanh</name><description>Crispy Vietnamese pancake. 97 St 41, Ward 9, D4</description><styleUrl>#food</styleUrl><Point><coordinates>106.7010,10.7590,0</coordinates></Point></Placemark>
+<Placemark><name>Banh Uot Ban Me Giang Vuong</name><description>Steamed rice rolls. 10 Ton That Tung, D1</description><styleUrl>#food</styleUrl><Point><coordinates>106.6900,10.7680,0</coordinates></Point></Placemark>
+<Placemark><name>Jeffrey's Kitchen</name><description>Taiwan Beef Noodles. 137 Cong Quynh, D1</description><styleUrl>#food</styleUrl><Point><coordinates>106.6912,10.7668,0</coordinates></Point></Placemark>
+<Placemark><name>Huynh Hoa Bread (Banh Mi)</name><description>Famous Vietnamese bread. 26 Le Thi Rieng, D1</description><styleUrl>#food</styleUrl><Point><coordinates>106.6880,10.7720,0</coordinates></Point></Placemark>
+<Placemark><name>Hu Tieu Nam Vang Thanh Dat</name><description>Pork &amp; prawn clear noodle soup. 34 Co Bac, D1</description><styleUrl>#food</styleUrl><Point><coordinates>106.6930,10.7660,0</coordinates></Point></Placemark>
+<Placemark><name>Bun Thit Nuong Chi Hang</name><description>BBQ pork with rice vermicelli, 5 min walk. 338 Nguyen Cong Tru, D1</description><styleUrl>#food</styleUrl><Point><coordinates>106.6960,10.7670,0</coordinates></Point></Placemark>
+</Folder>
+
+<Folder><name>☕ Drinks</name>
+<Placemark><name>Cong Coffee</name><description>Best seller: coconut coffee. 93 Yersin, D1</description><styleUrl>#drink</styleUrl><Point><coordinates>106.6935,10.7690,0</coordinates></Point></Placemark>
+<Placemark><name>Trung Nguyen Legend</name><description>Vietnamese coffee legend. 80 Dong Khoi, D1</description><styleUrl>#drink</styleUrl><Point><coordinates>106.7020,10.7760,0</coordinates></Point></Placemark>
+</Folder>
+
+<Folder><name>🛍 Shopping</name>
+<Placemark><name>GS25 Convenience Store</name><description>5 min walk from host. 2 Pho Duc Chinh, D1</description><styleUrl>#shop</styleUrl><Point><coordinates>106.6975,10.7688,0</coordinates></Point></Placemark>
+<Placemark><name>Mekong Gourmet Market</name><description>Fresh fruits, red wine. 73 Calmette, D1</description><styleUrl>#shop</styleUrl><Point><coordinates>106.6960,10.7700,0</coordinates></Point></Placemark>
+<Placemark><name>Maison Marou</name><description>Vietnamese chocolate, gifts. 5 min walk. 167-169 Calmette, D1</description><styleUrl>#shop</styleUrl><Point><coordinates>106.6955,10.7695,0</coordinates></Point></Placemark>
+<Placemark><name>Ben Thanh Market</name><description>Famous night market — bargain! 10 min walk</description><styleUrl>#shop</styleUrl><Point><coordinates>106.6980,10.7725,0</coordinates></Point></Placemark>
+</Folder>
+
+<Folder><name>📸 Sights</name>
+<Placemark><name>Notre Dame Cathedral</name><description>Landmark, 10 min taxi</description><styleUrl>#sight</styleUrl><Point><coordinates>106.6990,10.7798,0</coordinates></Point></Placemark>
+<Placemark><name>Central Post Office</name><description>Next to cathedral. 2 Công Xã Paris</description><styleUrl>#sight</styleUrl><Point><coordinates>106.6988,10.7800,0</coordinates></Point></Placemark>
+<Placemark><name>Opera House</name><description>Saigon Opera House. 7 Cong Truong Lam Son</description><styleUrl>#sight</styleUrl><Point><coordinates>106.7030,10.7765,0</coordinates></Point></Placemark>
+<Placemark><name>Reunification Palace</name><description>Historical site. 135 Nam Ky Khoi Nghia</description><styleUrl>#sight</styleUrl><Point><coordinates>106.6955,10.7790,0</coordinates></Point></Placemark>
+</Folder>
+
+<Folder><name>🚶 Walking Streets</name>
+<Placemark><name>Bui Vien Walking Street</name><description>Bars, nightlife — watch your bags!</description><styleUrl>#street</styleUrl><Point><coordinates>106.6935,10.7680,0</coordinates></Point></Placemark>
+<Placemark><name>Nguyen Hue Walking Street</name><description>Central tourist area, apartment cafés with views</description><styleUrl>#street</styleUrl><Point><coordinates>106.7010,10.7740,0</coordinates></Point></Placemark>
+</Folder>
+
+</Document>
+</kml>
