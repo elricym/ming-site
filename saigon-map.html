@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Saigon Picks 🇻🇳</title>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<style>
+body{margin:0;font-family:system-ui}
+#map{height:100vh;width:100%}
+.legend{background:#fff;padding:10px 14px;border-radius:8px;box-shadow:0 2px 6px rgba(0,0,0,.3);line-height:1.8;font-size:13px}
+.legend h4{margin:0 0 6px}
+.dot{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:6px}
+</style>
+</head>
+<body>
+<div id="map"></div>
+<script>
+const map = L.map('map').setView([10.7700, 106.6930], 15);
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{
+  attribution:'© OpenStreetMap',maxZoom:19}).addTo(map);
+
+const cats = {
+  food:    {color:'#e74c3c', label:'🍜 Food'},
+  drink:   {color:'#8e44ad', label:'☕ Drinks'},
+  shop:    {color:'#f39c12', label:'🛍 Shopping'},
+  sight:   {color:'#2980b9', label:'📸 Sights'},
+  street:  {color:'#27ae60', label:'🚶 Walking Streets'}
+};
+
+function icon(color){
+  return L.divIcon({className:'',html:`<div style="background:${color};width:14px;height:14px;border-radius:50%;border:2px solid #fff;box-shadow:0 1px 4px rgba(0,0,0,.4)"></div>`,iconSize:[18,18],iconAnchor:[9,9]});
+}
+
+const spots = [
+  // Food
+  {n:"Secret Garden Restaurant",a:"158 Pasteur, D1",d:"Vietnamese food, nice ambiance",lat:10.7758,lng:106.6938,c:"food"},
+  {n:"Bep Me In",a:"165/50 Nguyen Thai Binh, D1",d:"Vietnamese food, 3 min walk",lat:10.7710,lng:106.6935,c:"food"},
+  {n:"Banh Xeo Rau Rung Pho Thanh",a:"97 St 41, Ward 9, D4",d:"Crispy Vietnamese pancake",lat:10.7590,lng:106.7010,c:"food"},
+  {n:"Banh Uot Ban Me Giang Vuong",a:"10 Ton That Tung, D1",d:"Steamed rice rolls",lat:10.7680,lng:106.6900,c:"food"},
+  {n:"Jeffrey's Kitchen",a:"137 Cong Quynh, D1",d:"Taiwan Beef Noodles",lat:10.7668,lng:106.6912,c:"food"},
+  {n:"Huynh Hoa Bread (Banh Mi)",a:"26 Le Thi Rieng, D1",d:"Famous Vietnamese bread",lat:10.7720,lng:106.6880,c:"food"},
+  {n:"Hu Tieu Nam Vang Thanh Dat",a:"34 Co Bac, D1",d:"Pork & prawn clear noodle soup",lat:10.7660,lng:106.6930,c:"food"},
+  {n:"Bun Thit Nuong Chi Hang",a:"338 Nguyen Cong Tru, D1",d:"BBQ pork with rice vermicelli, 5 min walk",lat:10.7670,lng:106.6960,c:"food"},
+
+  // Drinks
+  {n:"Cong Coffee",a:"93 Yersin, D1",d:"Best seller: coconut coffee",lat:10.7690,lng:106.6935,c:"drink"},
+  {n:"Trung Nguyen Legend",a:"80 Dong Khoi, D1",d:"Vietnamese coffee legend",lat:10.7760,lng:106.7020,c:"drink"},
+
+  // Shopping
+  {n:"GS25 Convenience Store",a:"2 Pho Duc Chinh, D1",d:"5 min walk from host",lat:10.7688,lng:106.6975,c:"shop"},
+  {n:"Mekong Gourmet Market",a:"73 Calmette, D1",d:"Fresh fruits, red wine",lat:10.7700,lng:106.6960,c:"shop"},
+  {n:"Maison Marou",a:"167-169 Calmette, D1",d:"Vietnamese chocolate, gifts. 5 min walk",lat:10.7695,lng:106.6955,c:"shop"},
+  {n:"Ben Thanh Market",a:"Ben Thanh, D1",d:"Famous night market. Bargain! 10 min walk",lat:10.7725,lng:106.6980,c:"shop"},
+
+  // Sights
+  {n:"Notre Dame Cathedral",a:"Công Xã Paris",d:"Landmark, 10 min taxi",lat:10.7798,lng:106.6990,c:"sight"},
+  {n:"Central Post Office",a:"2 Công Xã Paris",d:"Next to cathedral",lat:10.7800,lng:106.6988,c:"sight"},
+  {n:"Opera House",a:"7 Cong Truong Lam Son",d:"Saigon Opera House",lat:10.7765,lng:106.7030,c:"sight"},
+  {n:"Reunification Palace",a:"135 Nam Ky Khoi Nghia",d:"Historical site",lat:10.7790,lng:106.6955,c:"sight"},
+
+  // Walking streets
+  {n:"Bui Vien Walking Street",a:"Bui Vien, D1",d:"Bars, nightlife — watch your bags!",lat:10.7680,lng:106.6935,c:"street"},
+  {n:"Nguyen Hue Walking Street",a:"Nguyen Hue, D1",d:"Central tourist area, apartment cafés with views",lat:10.7740,lng:106.7010,c:"street"},
+];
+
+spots.forEach(s=>{
+  L.marker([s.lat,s.lng],{icon:icon(cats[s.c].color)}).addTo(map)
+   .bindPopup(`<b>${s.n}</b><br><small>${s.a}</small><br>${s.d}`);
+});
+
+const legend = L.control({position:'bottomright'});
+legend.onAdd = ()=>{
+  const d=L.DomUtil.create('div','legend');
+  d.innerHTML='<h4>Saigon Picks</h4>'+Object.values(cats).map(c=>`<div><span class="dot" style="background:${c.color}"></span>${c.label}</div>`).join('');
+  return d;
+};
+legend.addTo(map);
+</script>
+</body>
+</html>
