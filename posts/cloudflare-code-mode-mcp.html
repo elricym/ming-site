@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Code Mode：用代码替代工具，把整个 API 塞进 1000 tokens — Ming</title>
+  <style>
+    :root { --bg: #0a0a0f; --card: #12121a; --text: #e0e0e8; --muted: #888899; --accent: #00e5cc; --accent2: #ff3d8b; --border: #1e1e2e; }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: -apple-system, 'SF Pro Text', 'Helvetica Neue', sans-serif; background: var(--bg); color: var(--text); line-height: 1.7; min-height: 100vh; }
+    body::before { content: ''; position: fixed; top: -50%; left: -50%; width: 200%; height: 200%; background: radial-gradient(circle at 30% 40%, rgba(0,229,204,0.04) 0%, transparent 50%), radial-gradient(circle at 70% 60%, rgba(255,61,139,0.03) 0%, transparent 50%); animation: drift 20s ease-in-out infinite alternate; z-index: -1; }
+    @keyframes drift { to { transform: translate(5%, -3%) rotate(1deg); } }
+    .container { max-width: 640px; margin: 0 auto; padding: 4rem 1.5rem; }
+    a { color: var(--accent); text-decoration: none; transition: color 0.2s; }
+    a:hover { color: var(--accent2); }
+    .back { font-size: 0.85rem; color: var(--muted); margin-bottom: 2rem; display: inline-block; }
+    .back:hover { color: var(--accent); }
+    .post-header { margin-bottom: 2rem; }
+    .post-header h1 { font-size: 1.5rem; font-weight: 700; margin-bottom: 0.5rem; }
+    .post-meta { font-size: 0.82rem; color: var(--muted); }
+    .tag { display: inline-block; font-size: 0.72rem; color: var(--accent); border: 1px solid rgba(0,229,204,0.25); border-radius: 4px; padding: 0.1rem 0.45rem; margin-right: 0.3rem; }
+    .post-body { font-size: 0.95rem; color: #b0b0c0; }
+    .post-body p { margin-bottom: 0.8rem; }
+    .post-body strong { color: var(--text); }
+    .post-body h2 { color: var(--text); font-size: 1.2rem; margin: 2rem 0 0.8rem; padding-bottom: 0.3rem; border-bottom: 1px solid var(--border); }
+    .post-body h3 { color: var(--text); font-size: 1.05rem; margin: 1.5rem 0 0.6rem; }
+    .post-body ul, .post-body ol { margin: 0.5rem 0 1rem 1.5rem; }
+    .post-body li { margin-bottom: 0.4rem; }
+    .post-body blockquote { border-left: 3px solid var(--accent); padding-left: 1rem; margin: 1rem 0; color: var(--muted); font-style: italic; }
+    .post-body code { background: rgba(0,229,204,0.08); padding: 0.15rem 0.4rem; border-radius: 3px; font-size: 0.88rem; color: var(--accent); }
+    .post-body pre { background: var(--card); border: 1px solid var(--border); border-radius: 6px; padding: 1rem; overflow-x: auto; margin: 1rem 0; }
+    .post-body pre code { background: none; padding: 0; font-size: 0.85rem; }
+    .post-nav { margin-top: 3rem; padding-top: 1.5rem; border-top: 1px solid var(--border); display: flex; justify-content: space-between; font-size: 0.85rem; }
+    .post-nav a { color: var(--muted); }
+    .post-nav a:hover { color: var(--accent); }
+    .footer { margin-top: 4rem; text-align: center; color: var(--muted); font-size: 0.78rem; }
+    @media (max-width: 480px) { .container { padding: 2.5rem 1rem; } .post-header h1 { font-size: 1.3rem; } }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <a class="back" href="/">← 返回首页</a>
+    <header class="post-header">
+      <h1>Code Mode：用代码替代工具，把整个 API 塞进 1000 tokens</h1>
+      <div class="post-meta">2026-02-21 · 技术解读</div>
+      <span class="tag">MCP</span>
+      <span class="tag">Agent</span>
+      <span class="tag">Cloudflare</span>
+      <span class="tag">工程实践</span>
+    </header>
+
+    <article class="post-body">
+      <p>Cloudflare 昨天发了一篇技术博客，提出了一个优雅到让人拍大腿的方案：<strong>用 2 个工具 + 1000 tokens，覆盖 2500+ 个 API 端点。</strong>比传统 MCP 方案节省 99.9% 的 token。</p>
+      <p>原文：<a href="https://blog.cloudflare.com/code-mode-mcp/" target="_blank">Code Mode: give agents an entire API in 1,000 tokens</a></p>
+
+      <h2>问题：MCP 的 context window 困境</h2>
+      <p>MCP（Model Context Protocol）已经成了 AI agent 调用外部工具的标准协议。但它有一个根本矛盾：<strong>agent 需要很多工具才能干活，但每加一个工具就吃掉一块 context window。</strong></p>
+      <p>Cloudflare API 有 2500+ 端点。如果按传统 MCP 的做法，每个端点定义成一个 tool，光是工具描述就需要 <strong>117 万 tokens</strong>——比任何模型的 context window 都大。</p>
+      <p>之前 Cloudflare 的解法是按产品拆分：DNS 一个 MCP server，Workers 一个，R2 又一个……但 2500 个端点手动维护几十个 server？不现实。</p>
+
+      <h2>解法：让 agent 写代码而不是选工具</h2>
+      <p>Code Mode 的核心思想非常简单：<strong>不要给模型一个工具列表让它挑，给它一个 SDK 让它写代码。</strong></p>
+      <p>整个 MCP server 只暴露两个工具：</p>
+      <ul>
+        <li><code>search(code)</code> — agent 写 JavaScript 搜索 OpenAPI spec，按需发现端点</li>
+        <li><code>execute(code)</code> — agent 写 JavaScript 调用 API，可以链式执行多个操作</li>
+      </ul>
+      <p>工具定义加起来约 1000 tokens，<strong>固定开销，不随 API 规模增长。</strong></p>
+
+      <h3>search：渐进式发现</h3>
+      <p>agent 不需要一次看到所有 2500 个端点。它先搜索：</p>
+      <pre><code>async () => {
+  const results = [];
+  for (const [path, methods] of Object.entries(spec.paths)) {
+    if (path.includes('/zones/') &&
+        path.includes('rulesets')) {
+      for (const [method, op] of Object.entries(methods)) {
+        results.push({ method: method.toUpperCase(), path, summary: op.summary });
+      }
+    }
+  }
+  return results;
+}</code></pre>
+      <p>2500 个端点瞬间缩小到它需要的那几个。OpenAPI spec 从未进入 context window——agent 只是通过代码去查询它。</p>
+
+      <h3>execute：一次调用完成多步操作</h3>
+      <p>传统 MCP 下，查询 + 修改可能需要 4-5 次 tool call，每次都要来回传递上下文。Code Mode 下，agent 写一段代码一次搞定：</p>
+      <pre><code>async () => {
+  const ddos = await cloudflare.request({
+    method: "GET",
+    path: `/zones/${zoneId}/rulesets/phases/ddos_l7/entrypoint`
+  });
+  const waf = await cloudflare.request({
+    method: "GET",
+    path: `/zones/${zoneId}/rulesets/phases/http_request_firewall_managed/entrypoint`
+  });
+  return { ddos: ddos.result, waf: waf.result };
+}</code></pre>
+
+      <h2>安全：V8 沙箱隔离</h2>
+      <p>让 agent 写代码执行，安全怎么办？Cloudflare 用了自家的 <strong>Dynamic Worker Loader</strong>——每段代码跑在独立的 V8 isolate 里：</p>
+      <ul>
+        <li>没有文件系统访问</li>
+        <li>没有环境变量泄露（防 prompt injection）</li>
+        <li>外部网络请求默认禁止，需要显式开启</li>
+        <li>OAuth 2.1 权限控制，agent 只能用用户授权的能力</li>
+      </ul>
+      <p>这比 CLI 方案（给 agent 一个 shell）安全得多。Shell 的攻击面是整个操作系统，V8 isolate 的攻击面只有一个沙箱。</p>
+
+      <h2>四种 context 压缩方案的对比</h2>
+      <p>文章梳理了当前业界的四种方案，这个对比很有价值：</p>
+      <ul>
+        <li><strong>Client-side Code Mode</strong> — agent 在客户端写代码执行。需要客户端有沙箱环境。Anthropic 的 Programmatic Tool Calling 就是这个路线。</li>
+        <li><strong>CLI 方式</strong> — 把 MCP server 转成命令行工具，agent 通过 shell 渐进发现。OpenClaw 和 MCPorter 用的就是这种。缺点：需要 shell，攻击面大。</li>
+        <li><strong>Dynamic tool search</strong> — 动态搜索匹配当前任务的工具子集。Claude Code 内部用的方式。缺点：搜索函数本身需要维护和评估，匹配到的工具仍然消耗 token。</li>
+        <li><strong>Server-side Code Mode</strong> — 就是 Cloudflare 这次发布的方案。固定 token 成本，不需要客户端改动，渐进发现内置，沙箱执行安全。</li>
+      </ul>
+
+      <h2>我的思考</h2>
+
+      <h3>这本质上是"编译"思想</h3>
+      <p>传统 MCP 是"解释执行"——每个操作都是一次 tool call，模型一步一步走。Code Mode 是"编译执行"——模型先写一段程序，一次性批量执行。同样的逻辑，从 N 次网络往返变成了 1 次。这和数据库领域从逐行查询到批量 SQL 的演进一模一样。</p>
+
+      <h3>对 MCP 生态的影响</h3>
+      <p>如果 Code Mode 成为主流，MCP 的生态会发生结构性变化：</p>
+      <ul>
+        <li><strong>工具定义变得不重要了</strong>——不需要精心设计每个 tool 的参数和描述，只需要一个好的 SDK</li>
+        <li><strong>OpenAPI spec 成了一等公民</strong>——只要你有 OpenAPI spec，就能自动生成 Code Mode MCP server</li>
+        <li><strong>MCP server 的维护成本大幅下降</strong>——不用每加一个 API 端点就更新工具定义</li>
+      </ul>
+
+      <h3>局限性</h3>
+      <p>Code Mode 不是银弹。它要求模型具备<strong>写正确 JavaScript 的能力</strong>。对于 Claude、GPT-4 这种前沿模型没问题，但小模型可能会在代码生成阶段就出错。另外，调试也变得更复杂——当 agent 写的代码出 bug，你需要理解它试图做什么，而不是简单地看 tool call 的参数。</p>
+
+      <h3>呼应极简哲学</h3>
+      <p>有意思的是，这和我之前写的 <a href="/posts/pi-coding-agent.html">Pi Coding Agent</a> 的理念高度一致——<strong>少即是多</strong>。Pi 用 4 个工具 + 1000 tokens 的 system prompt 在 benchmark 上不输复杂框架。Cloudflare 用 2 个工具 + 1000 tokens 覆盖了 2500 个 API 端点。</p>
+      <p>这不是巧合。前沿模型越来越强，不需要我们用复杂的工具定义来"教"它怎么做。给它一个最小化的接口和足够的自由度，它自己能找到最优路径。</p>
+
+      <h3>未来方向</h3>
+      <p>文章最后提到了 <strong>MCP Server Portals</strong>——多个 MCP server 聚合在一个网关后面，统一用 Code Mode 暴露。想象一下：一个 agent 同时访问 Cloudflare API + GitHub API + 数据库 + 内部文档，全都通过 2 个工具、固定 1000 tokens 完成。这才是 agent 基础设施应该的样子。</p>
+    </article>
+
+    <nav class="post-nav">
+      <a href="/posts/dario-amodei-interview-2026.html">← Dario Amodei 访谈解读</a>
+      <span></span>
+    </nav>
+
+    <footer class="footer">© 2026 Ming · 用 AI 写代码的人</footer>
+  </div>
+</body>
+</html>
