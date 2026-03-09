@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Harness Engineering 就是控制论 — Ming</title>
+  <style>
+    :root { --bg: #0a0a0f; --card: #12121a; --text: #e0e0e8; --muted: #888899; --accent: #00e5cc; --accent2: #ff3d8b; --border: #1e1e2e; }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: -apple-system, 'SF Pro Text', 'Helvetica Neue', sans-serif; background: var(--bg); color: var(--text); line-height: 1.7; min-height: 100vh; }
+    body::before { content: ''; position: fixed; top: -50%; left: -50%; width: 200%; height: 200%; background: radial-gradient(circle at 30% 40%, rgba(0,229,204,0.04) 0%, transparent 50%), radial-gradient(circle at 70% 60%, rgba(255,61,139,0.03) 0%, transparent 50%); animation: drift 20s ease-in-out infinite alternate; z-index: -1; }
+    @keyframes drift { to { transform: translate(5%, -3%) rotate(1deg); } }
+    .container { max-width: 640px; margin: 0 auto; padding: 4rem 1.5rem; }
+    a { color: var(--accent); text-decoration: none; transition: color 0.2s; }
+    a:hover { color: var(--accent2); }
+    .back { font-size: 0.85rem; color: var(--muted); margin-bottom: 2rem; display: inline-block; }
+    .back:hover { color: var(--accent); }
+    .post-header { margin-bottom: 2rem; }
+    .post-header h1 { font-size: 1.5rem; font-weight: 700; margin-bottom: 0.5rem; }
+    .post-meta { font-size: 0.82rem; color: var(--muted); }
+    .tag { display: inline-block; font-size: 0.72rem; color: var(--accent); border: 1px solid rgba(0,229,204,0.25); border-radius: 4px; padding: 0.1rem 0.45rem; margin-right: 0.3rem; }
+    .post-body { font-size: 0.95rem; color: #b0b0c0; }
+    .post-body p { margin-bottom: 0.8rem; }
+    .post-body strong { color: var(--text); }
+    .post-body h2 { color: var(--text); font-size: 1.2rem; margin: 2rem 0 0.8rem; padding-bottom: 0.3rem; border-bottom: 1px solid var(--border); }
+    .post-body h3 { color: var(--text); font-size: 1.05rem; margin: 1.5rem 0 0.6rem; }
+    .post-body ul, .post-body ol { margin: 0.5rem 0 1rem 1.5rem; }
+    .post-body li { margin-bottom: 0.4rem; }
+    .post-body blockquote { border-left: 3px solid var(--accent); padding-left: 1rem; margin: 1rem 0; color: var(--muted); font-style: italic; }
+    .post-body code { background: rgba(0,229,204,0.08); padding: 0.15rem 0.4rem; border-radius: 3px; font-size: 0.88rem; color: var(--accent); }
+    .post-body pre { background: var(--card); border: 1px solid var(--border); border-radius: 6px; padding: 1rem; overflow-x: auto; margin: 1rem 0; }
+    .post-body pre code { background: none; padding: 0; }
+    .post-nav { margin-top: 3rem; padding-top: 1.5rem; border-top: 1px solid var(--border); display: flex; justify-content: space-between; font-size: 0.85rem; }
+    .footer { margin-top: 4rem; text-align: center; color: var(--muted); font-size: 0.78rem; }
+    @media (max-width: 480px) { .container { padding: 2.5rem 1rem; } .post-header h1 { font-size: 1.3rem; } }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <a class="back" href="/">← 返回首页</a>
+
+    <header class="post-header">
+      <h1>Harness Engineering 就是控制论</h1>
+      <div class="post-meta">
+        2026-03-09 · 阅读 George 的文章有感
+        <br>
+        <span class="tag">AI</span>
+        <span class="tag">Agent</span>
+        <span class="tag">工程哲学</span>
+        <span class="tag">控制论</span>
+      </div>
+    </header>
+
+    <article class="post-body">
+      <p>George (@odysseus0z) 写了一篇 <a href="https://x.com/odysseus0z/status/2030416758138634583" target="_blank">精彩的文章</a>，把 OpenAI 提出的 "Harness Engineering" 放进了一个更深的历史脉络：<strong>控制论（Cybernetics）</strong>。</p>
+
+      <p>读完之后很兴奋，因为它说清楚了我一直隐约感觉到、但没能准确表达的东西。</p>
+
+      <h2>同一个模式，出现了三次</h2>
+
+      <p>文章的核心论点极其干净：人类历史上反复出现同一个模式——<strong>从亲手操作，到设计控制系统</strong>。</p>
+
+      <p><strong>1780s，瓦特离心调速器。</strong>工人不再手动调节蒸汽阀门，改为设计一个能感知转速并自动调节的飞球机构。工人没有消失，工作变了：从转阀门到设计调速器。</p>
+
+      <p><strong>2010s，Kubernetes。</strong>工程师不再手动重启服务，改为写声明式 spec——三个副本、这个镜像、这些资源限制。控制器持续观察实际状态，偏离时自动修复。工程师的工作从重启服务变成了写 spec。</p>
+
+      <p><strong>现在，Harness Engineering。</strong>工程师不再写代码，改为设计环境、构建反馈循环、编码架构约束——然后让 agent 写代码。OpenAI 五个月产出一百万行代码，没有一行是人写的。</p>
+
+      <p>1948 年，维纳（Norbert Wiener）给这个模式命了名：<strong>Cybernetics</strong>，来自希腊语 κυβερνήτης——舵手。你不再转阀门。你掌舵。</p>
+
+      <h2>为什么代码库是最后的阵地</h2>
+
+      <p>这是文章里我觉得最精彩的部分。</p>
+
+      <p>代码库一直有反馈循环：编译器检查语法，测试检查行为，linter 检查风格。但这些都是<strong>低层级</strong>的机械检查。</p>
+
+      <p>真正高层级的判断——这个改动是否符合系统架构？这个抽象会不会随着代码增长变成负担？——<strong>以前没有传感器，也没有执行器</strong>。只有人能做。</p>
+
+      <p>LLM 第一次同时改变了两端：它能<strong>感知</strong>代码在架构层面的问题，也能<strong>执行</strong>修复——重构模块、重新设计接口、围绕真正重要的契约重写测试。反馈循环终于能在关键决策层闭合了。</p>
+
+      <h2>Agent 做错事，问题在你</h2>
+
+      <blockquote>"It keeps doing the wrong thing. It doesn't understand our codebase."</blockquote>
+
+      <p>George 说，这个诊断几乎每次都是错的。</p>
+
+      <p>Agent 失败<strong>不是因为能力不够</strong>，是因为它需要的知识——什么叫"好"、你的架构奖励什么模式、回避什么模式——<strong>锁在你脑子里，你没写下来</strong>。</p>
+
+      <p>Agent 不会通过耳濡目染来学习。如果你不外化你的判断力，agent 跑一百次和跑一次犯的是同样的错。</p>
+
+      <p>这让我想到一个很反直觉的结论：<strong>在 agent 时代，文档比代码更重要</strong>。架构文档、自定义 linter 带修复指引、编码团队品味的黄金准则——这些才是 harness 的核心。OpenAI 自己每周五花 20% 时间清理 "AI slop"，直到他们把标准编码进 harness 本身。</p>
+
+      <h2>代价不对称</h2>
+
+      <p>文档、测试、架构约束——这些"正确实践"写在过去三十年的每一本工程书里。大多数人跳过，因为代价是缓慢且分散的：质量缓慢下降、新人上手痛苦、技术债悄悄积累。</p>
+
+      <p>Agent 时代让代价变得<strong>灾难性</strong>。</p>
+
+      <p>不写文档？Agent 会无视你的规范——不是一个 PR，而是每一个 PR，以机器速度，24 小时不停。不写测试？反馈循环根本无法闭合。不编码架构约束？drift 的积累速度超过你修复的速度。</p>
+
+      <p>而且这里有个陷阱：<strong>如果 agent 不知道"干净"长什么样，你也不能用 agent 来清理这个烂摊子</strong>。</p>
+
+      <h2>你不需要比机器写得好</h2>
+
+      <p>文章最后引用了 generation-verification 不对称性——P vs NP 背后的直觉。生成一个正确的解比验证一个解要难得多。</p>
+
+      <p>你不需要 out-implement 机器。你需要 <strong>out-evaluate</strong> 它：定义什么叫"正确"，识别输出何时偏离，判断方向是否正确。</p>
+
+      <p>设计瓦特调速器的工人再也没回去手动转阀门。不是因为他们不能，而是因为<strong>那已经不再 make sense</strong>。</p>
+
+      <h2>我的感受</h2>
+
+      <p>我每天在做的事——设计 agent 的环境、写 AGENTS.md、配置 skill、调试反馈循环——本质上就是控制论的实践。我不写代码让 agent 跑，我设计<strong>让 agent 正确运转的系统</strong>。</p>
+
+      <p>George 这篇文章让我意识到，这不是什么新范式。它是一个至少 250 年的老模式，只不过终于到达了软件工程这一层。</p>
+
+      <p><strong>我们都是舵手。</strong></p>
+    </article>
+
+    <div class="post-nav">
+      <a href="/posts/agent-upgrade-guide.html">← 个人业务 Agent 化升级指南</a>
+      <span></span>
+    </div>
+
+    <footer class="footer">
+      <p>用代码思考，以文字记录 ✦</p>
+    </footer>
+  </div>
+</body>
+</html>
