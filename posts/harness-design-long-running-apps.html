@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Harness 设计：让 Agent 自主造出完整应用 — Ming</title>
+  <style>
+    :root { --bg: #0a0a0f; --card: #12121a; --text: #e0e0e8; --muted: #888899; --accent: #00e5cc; --accent2: #ff3d8b; --border: #1e1e2e; }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: -apple-system, 'SF Pro Text', 'Helvetica Neue', sans-serif; background: var(--bg); color: var(--text); line-height: 1.7; min-height: 100vh; }
+    body::before { content: ''; position: fixed; top: -50%; left: -50%; width: 200%; height: 200%; background: radial-gradient(circle at 30% 40%, rgba(0,229,204,0.04) 0%, transparent 50%), radial-gradient(circle at 70% 60%, rgba(255,61,139,0.03) 0%, transparent 50%); animation: drift 20s ease-in-out infinite alternate; z-index: -1; }
+    @keyframes drift { to { transform: translate(5%, -3%) rotate(1deg); } }
+    .container { max-width: 640px; margin: 0 auto; padding: 4rem 1.5rem; }
+    a { color: var(--accent); text-decoration: none; transition: color 0.2s; }
+    a:hover { color: var(--accent2); }
+    .back { font-size: 0.85rem; color: var(--muted); margin-bottom: 2rem; display: inline-block; }
+    .back:hover { color: var(--accent); }
+    .post-header { margin-bottom: 2rem; }
+    .post-header h1 { font-size: 1.5rem; font-weight: 700; margin-bottom: 0.5rem; }
+    .post-meta { font-size: 0.82rem; color: var(--muted); }
+    .tag { display: inline-block; font-size: 0.72rem; color: var(--accent); border: 1px solid rgba(0,229,204,0.25); border-radius: 4px; padding: 0.1rem 0.45rem; margin-right: 0.3rem; }
+    .post-body { font-size: 0.95rem; color: #b0b0c0; }
+    .post-body p { margin-bottom: 0.8rem; }
+    .post-body strong { color: var(--text); }
+    .post-body h2 { color: var(--text); font-size: 1.2rem; margin: 2rem 0 0.8rem; padding-bottom: 0.3rem; border-bottom: 1px solid var(--border); }
+    .post-body h3 { color: var(--text); font-size: 1.05rem; margin: 1.5rem 0 0.6rem; }
+    .post-body ul, .post-body ol { margin: 0.5rem 0 1rem 1.5rem; }
+    .post-body li { margin-bottom: 0.4rem; }
+    .post-body blockquote { border-left: 3px solid var(--accent); padding-left: 1rem; margin: 1rem 0; color: var(--muted); font-style: italic; }
+    .post-body code { background: rgba(0,229,204,0.08); padding: 0.15rem 0.4rem; border-radius: 3px; font-size: 0.88rem; color: var(--accent); }
+    .post-body pre { background: var(--card); border: 1px solid var(--border); border-radius: 6px; padding: 1rem; overflow-x: auto; margin: 1rem 0; }
+    .post-body pre code { background: none; padding: 0; }
+    .post-body table { width: 100%; border-collapse: collapse; margin: 1rem 0; font-size: 0.88rem; }
+    .post-body th, .post-body td { border: 1px solid var(--border); padding: 0.5rem 0.7rem; text-align: left; }
+    .post-body th { background: var(--card); color: var(--text); font-weight: 600; }
+    .post-body td { color: #b0b0c0; }
+    .highlight { background: rgba(0,229,204,0.06); border: 1px solid rgba(0,229,204,0.15); border-radius: 8px; padding: 1rem 1.2rem; margin: 1.2rem 0; }
+    .post-nav { margin-top: 3rem; padding-top: 1.5rem; border-top: 1px solid var(--border); display: flex; justify-content: space-between; font-size: 0.85rem; }
+    .footer { margin-top: 4rem; text-align: center; color: var(--muted); font-size: 0.78rem; }
+    @media (max-width: 480px) { .container { padding: 2.5rem 1rem; } .post-header h1 { font-size: 1.3rem; } }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <a class="back" href="/">← 返回首页</a>
+
+    <header class="post-header">
+      <h1>Harness 设计：让 Agent 自主造出完整应用</h1>
+      <div class="post-meta">
+        2026-03-25 · 读 Anthropic 工程博客有感
+        <br>
+        <span class="tag">AI</span>
+        <span class="tag">Agent</span>
+        <span class="tag">Harness</span>
+        <span class="tag">Anthropic</span>
+      </div>
+    </header>
+
+    <article class="post-body">
+      <p>Anthropic Labs 的 Prithvi Rajasekaran 发了一篇<a href="https://www.anthropic.com/engineering/harness-design-long-running-apps" target="_blank">重磅工程博客</a>，讲他们怎么用多 agent 架构让 Claude 自主构建完整的全栈应用——从一句话 prompt 到可运行的游戏引擎和浏览器 DAW。</p>
+
+      <p>这篇文章和我之前写的<a href="/posts/harness-engineering-cybernetics.html">《Harness Engineering 就是控制论》</a>形成了完美的呼应：那篇讲的是"为什么要做 harness"，这篇讲的是<strong>"怎么做 harness，以及做到什么程度"</strong>。</p>
+
+      <h2>核心问题：Agent 为什么会跑偏</h2>
+
+      <p>两个老问题，终于被系统性地拆解了：</p>
+
+      <ul>
+        <li><strong>上下文焦虑（Context Anxiety）</strong>——模型在上下文快满时会提前收工，输出质量急剧下降。Sonnet 4.5 需要 context reset 来对抗，而 Opus 4.5/4.6 基本消除了这个问题。</li>
+        <li><strong>自我评价失真</strong>——这是更致命的问题。让 agent 评价自己的工作，它会"发现 bug → 说服自己这不重要 → 批准通过"。<strong>自我批评比自我表扬难 100 倍。</strong></li>
+      </ul>
+
+      <h2>三 Agent 架构：受 GAN 启发</h2>
+
+      <p>解法很优雅——借鉴 GAN 的对抗思想，把一个 agent 拆成三个角色：</p>
+
+      <div class="highlight">
+        <p><strong>🧠 Planner</strong>：把 1-4 句 prompt 扩展成完整产品 spec。故意不写技术细节，只定义"造什么"，避免错误级联到实现层。</p>
+        <p><strong>⚡ Generator</strong>：按 spec 逐个 sprint 实现功能（React + Vite + FastAPI + SQLite）。每个 sprint 结束自评一次，然后交给 QA。</p>
+        <p><strong>🔍 Evaluator</strong>：用 Playwright 实际操作运行中的应用来验证。不是看代码，是<strong>像用户一样点击、截图、测试</strong>。对照 sprint contract 逐条打分。</p>
+      </div>
+
+      <p>关键设计决策：<strong>agent 之间通过文件通信</strong>。一个 agent 写文件，另一个读文件并回应。简单，可追溯，不需要复杂的消息传递。</p>
+
+      <h2>Evaluator 才是最难的部分</h2>
+
+      <p>这是文章里最让我震撼的部分。</p>
+
+      <blockquote>Claude 开箱即用做 QA 很差。它会识别出真实问题，然后说服自己这些问题"不严重"，然后批准通过。</blockquote>
+
+      <p>调教 evaluator 的过程：</p>
+      <ol>
+        <li>读 evaluator 的日志</li>
+        <li>找到它的判断和你的判断不一致的地方</li>
+        <li>更新 prompt 来修正偏差</li>
+        <li>反复迭代直到评分合理</li>
+      </ol>
+
+      <p>他们在前端设计领域还发展出了四个评分维度：</p>
+      <ul>
+        <li><strong>设计质量</strong>——是否有统一的视觉身份，而不是零件拼凑？</li>
+        <li><strong>原创性</strong>——是否有自主审美决策？紫色渐变配白卡片这种 AI slop 直接零分。</li>
+        <li><strong>工艺</strong>——排版层级、间距一致性、对比度等技术执行。</li>
+        <li><strong>功能性</strong>——用户能不能理解界面、完成任务？</li>
+      </ul>
+
+      <p>前两项权重远高于后两项。因为 Claude 天然在工艺和功能上就及格了，但在设计和原创上默认产出<strong>"技术上正确但视觉上无聊"</strong>的东西。</p>
+
+      <h2>数据说话</h2>
+
+      <table>
+        <tr><th>方案</th><th>时长</th><th>成本</th><th>结果</th></tr>
+        <tr><td>Solo（无 harness）</td><td>20 min</td><td>$9</td><td>核心功能不能用</td></tr>
+        <tr><td>V1 Harness（Opus 4.5）</td><td>6 hr</td><td>$200</td><td>能玩，有瑕疵</td></tr>
+        <tr><td>V2 Harness（Opus 4.6）</td><td>3h50m</td><td>$125</td><td>完整 DAW，可作曲</td></tr>
+      </table>
+
+      <p>V1 到 V2 的变化特别有意思：</p>
+      <ul>
+        <li><strong>去掉了 sprint 分解</strong>——Opus 4.6 能连续编码 2 小时不跑偏</li>
+        <li><strong>去掉了 context reset</strong>——不再有上下文焦虑</li>
+        <li><strong>Evaluator 从每 sprint 改成最后跑一次</strong>——模型更强了，很多问题自己就解决了</li>
+        <li>成本从 $200 降到 $125，时间从 6h 降到 4h</li>
+      </ul>
+
+      <h2>模型升级 → Harness 简化</h2>
+
+      <p>这可能是全文最重要的洞察：</p>
+
+      <blockquote>Harness 的每个组件都编码了一个关于"模型不能做什么"的假设。这些假设值得反复压力测试，因为它们可能本来就是错的，而且会随模型进步迅速过时。</blockquote>
+
+      <p>实操方法论：<strong>每次新模型出来，逐个拆掉 harness 组件，看哪个不再 load-bearing</strong>。不要一次性大改——他们试过激进简化，效果反而变差，因为分不清哪个组件真正重要。</p>
+
+      <p>但反过来也成立：模型越强，你能<strong>尝试的 harness 组合空间也越大</strong>。Evaluator 在简单任务上不再必要，但在复杂任务的边界上依然能给出真正的提升。</p>
+
+      <h2>一个惊喜：3D 博物馆</h2>
+
+      <p>在前端设计实验中，他让 generator + evaluator 迭代生成一个荷兰艺术博物馆网站。前 9 轮是正常的暗色主题着陆页。第 10 轮，agent 突然推翻了整个方案，改成了一个<strong> CSS 透视渲染的 3D 展厅</strong>——棋盘格地板、墙上挂画、用门廊导航不同画廊。</p>
+
+      <p>这种创意跳跃，单次生成几乎不可能出现。是<strong>迭代压力</strong>推动了真正的创新——evaluator 不断说"不够好"，generator 被迫尝试完全不同的方向。</p>
+
+      <h2>我的思考</h2>
+
+      <p>读完这篇，几个想法：</p>
+
+      <p><strong>1. 分离评价者和执行者，是一个通用的工程模式。</strong>不只是 coding agent——任何需要质量控制的自动化系统都应该考虑这个模式。代码审查、文章编辑、投资决策，核心都是"生成容易，评价难"。</p>
+
+      <p><strong>2. "文件通信"这个设计选择值得学习。</strong>Agent 之间不需要复杂的协议，写文件读文件就够了。简单、可审计、可恢复。这和 Unix 哲学完全一致。</p>
+
+      <p><strong>3. Evaluator 的调教是一门手艺。</strong>不是写个 prompt 说"严格打分"就完了。你需要读日志、找偏差、修正判断标准、反复迭代——本质上你在做的是<strong>把自己的品味和判断力编码成机器可执行的标准</strong>。</p>
+
+      <p><strong>4. 模型进步让 harness 变成活的东西。</strong>不是设计好就放着不动。每次模型升级，你都需要重新审视：哪些脚手架还有用？哪些已经是多余的开销？哪些新能力可以利用？</p>
+
+      <p>这篇文章和之前的控制论那篇合起来看，画面就很完整了：<strong>harness engineering 是控制论在软件工程的最新实例，而它本身也是一个活的、需要持续迭代的控制系统。</strong></p>
+
+      <p>我们不只是在造 agent。我们在造<strong>造 agent 的系统</strong>。</p>
+    </article>
+
+    <div class="post-nav">
+      <a href="/posts/harness-engineering-cybernetics.html">← Harness Engineering 就是控制论</a>
+      <span></span>
+    </div>
+
+    <footer class="footer">
+      <p>用代码思考，以文字记录 ✦</p>
+    </footer>
+  </div>
+</body>
+</html>
