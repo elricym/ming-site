@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>拆解 Claude Code 源码：7 大核心系统全解析 — Ming</title>
+  <style>
+    :root { --bg: #0a0a0f; --card: #12121a; --text: #e0e0e8; --muted: #888899; --accent: #00e5cc; --accent2: #ff3d8b; --border: #1e1e2e; }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: -apple-system, 'SF Pro Text', 'Helvetica Neue', sans-serif; background: var(--bg); color: var(--text); line-height: 1.7; min-height: 100vh; }
+    body::before { content: ''; position: fixed; top: -50%; left: -50%; width: 200%; height: 200%; background: radial-gradient(circle at 30% 40%, rgba(0,229,204,0.04) 0%, transparent 50%), radial-gradient(circle at 70% 60%, rgba(255,61,139,0.03) 0%, transparent 50%); animation: drift 20s ease-in-out infinite alternate; z-index: -1; }
+    @keyframes drift { to { transform: translate(5%, -3%) rotate(1deg); } }
+    .container { max-width: 640px; margin: 0 auto; padding: 4rem 1.5rem; }
+    a { color: var(--accent); text-decoration: none; transition: color 0.2s; }
+    a:hover { color: var(--accent2); }
+    .back { font-size: 0.85rem; color: var(--muted); margin-bottom: 2rem; display: inline-block; }
+    .back:hover { color: var(--accent); }
+    .post-header { margin-bottom: 2rem; }
+    .post-header h1 { font-size: 1.5rem; font-weight: 700; margin-bottom: 0.5rem; }
+    .post-meta { font-size: 0.82rem; color: var(--muted); }
+    .tag { display: inline-block; font-size: 0.72rem; color: var(--accent); border: 1px solid rgba(0,229,204,0.25); border-radius: 4px; padding: 0.1rem 0.45rem; margin-right: 0.3rem; }
+    .post-body { font-size: 0.95rem; color: #b0b0c0; }
+    .post-body p { margin-bottom: 0.8rem; }
+    .post-body strong { color: var(--text); }
+    .post-body h2 { color: var(--text); font-size: 1.2rem; margin: 2rem 0 0.8rem; padding-bottom: 0.3rem; border-bottom: 1px solid var(--border); }
+    .post-body h3 { color: var(--text); font-size: 1.05rem; margin: 1.5rem 0 0.6rem; }
+    .post-body ul, .post-body ol { margin: 0.5rem 0 1rem 1.5rem; }
+    .post-body li { margin-bottom: 0.4rem; }
+    .post-body blockquote { border-left: 3px solid var(--accent); padding-left: 1rem; margin: 1rem 0; color: var(--muted); font-style: italic; }
+    .post-body code { background: rgba(0,229,204,0.08); padding: 0.15rem 0.4rem; border-radius: 3px; font-size: 0.88rem; color: var(--accent); }
+    .post-body pre { background: var(--card); border: 1px solid var(--border); border-radius: 6px; padding: 1rem; overflow-x: auto; margin: 1rem 0; }
+    .post-body pre code { background: none; padding: 0; }
+    .post-body table { width: 100%; border-collapse: collapse; margin: 1rem 0; font-size: 0.88rem; }
+    .post-body th, .post-body td { border: 1px solid var(--border); padding: 0.5rem 0.7rem; text-align: left; }
+    .post-body th { background: var(--card); color: var(--text); font-weight: 600; }
+    .post-body td { color: #b0b0c0; }
+    .post-nav { margin-top: 3rem; padding-top: 1.5rem; border-top: 1px solid var(--border); display: flex; justify-content: space-between; font-size: 0.85rem; }
+    .footer { margin-top: 4rem; text-align: center; color: var(--muted); font-size: 0.78rem; }
+    .toc { background: var(--card); border: 1px solid var(--border); border-radius: 8px; padding: 1.2rem 1.5rem; margin-bottom: 2rem; }
+    .toc-title { font-size: 0.9rem; color: var(--text); font-weight: 600; margin-bottom: 0.5rem; }
+    .toc ol { margin: 0; padding-left: 1.2rem; }
+    .toc li { margin-bottom: 0.3rem; font-size: 0.85rem; }
+    .toc a { color: var(--muted); }
+    .toc a:hover { color: var(--accent); }
+    .highlight-box { background: rgba(0,229,204,0.05); border: 1px solid rgba(0,229,204,0.15); border-radius: 6px; padding: 1rem 1.2rem; margin: 1rem 0; }
+    @media (max-width: 480px) { .container { padding: 2.5rem 1rem; } .post-header h1 { font-size: 1.3rem; } }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <a class="back" href="/">← 返回首页</a>
+
+    <header class="post-header">
+      <h1>拆解 Claude Code 源码：7 大核心系统全解析</h1>
+      <div class="post-meta">
+        2026-04-01 · 基于反编译源码的架构分析
+        <br>
+        <span class="tag">Claude Code</span>
+        <span class="tag">Agent</span>
+        <span class="tag">源码分析</span>
+        <span class="tag">Anthropic</span>
+      </div>
+    </header>
+
+    <div class="post-body">
+      <p>有人把 Claude Code 的源码<a href="https://github.com/sanbuphy/claude-code-source-code" target="_blank">反编译</a>了。花了一晚上通读，发现它远不只是一个"会用工具的 chatbot"——而是一套完整的 <strong>多 Agent 协作操作系统</strong>。</p>
+
+      <p>这篇文章拆解 Claude Code 的 7 大核心系统。每个系统是什么、怎么工作、为什么这么设计。</p>
+
+      <nav class="toc">
+        <div class="toc-title">目录</div>
+        <ol>
+          <li><a href="#team">Agent Team — 多 Agent 协作</a></li>
+          <li><a href="#tree">Agent Tree — 层级与分叉</a></li>
+          <li><a href="#mcp">Tool Server — MCP 双向桥接</a></li>
+          <li><a href="#skill">Skill System — 技能即 Prompt</a></li>
+          <li><a href="#async">Async Tool — 后台执行</a></li>
+          <li><a href="#sequential">Sequential Tool — 并行与顺序</a></li>
+          <li><a href="#harness">Harness — 运行时框架</a></li>
+        </ol>
+      </nav>
+
+      <h2 id="team">1. Agent Team — 多 Agent 协作</h2>
+
+      <p>这是 Claude Code 最复杂的系统。它让一个 <strong>Coordinator</strong>（协调者）管理多个 <strong>Teammate</strong>（队友）并行工作，共享一个任务列表。</p>
+
+      <h3>工作流</h3>
+
+      <pre><code>Coordinator
+  ├── TeamCreate → 创建团队 + 共享任务列表
+  ├── TaskCreate → 拆分任务
+  ├── Agent(team_name, name) → 生成队友
+  ├── SendMessage → 给队友发指令
+  └── TaskStop → 停止出错的队友</code></pre>
+
+      <p>每个队友自动从 <code>~/.claude/tasks/{team-name}/</code> 领取任务，完成后标记，检查下一个。消息<strong>自动投递</strong>，不需要轮询。</p>
+
+      <h3>Coordinator 模式的精髓</h3>
+
+      <p>Coordinator 模式下，主 Agent <strong>只有 4 个工具</strong>：Agent、SendMessage、TaskStop、SyntheticOutput。它不碰代码，只做一件事：<strong>理解 + 指挥</strong>。</p>
+
+      <div class="highlight-box">
+        <p><strong>核心原则：Never delegate understanding.</strong></p>
+        <p>不许写 "based on your findings, fix the bug"——这是在把理解的责任推给 worker。Coordinator 必须综合研究结果，写出包含<strong>具体文件路径、行号、修改内容</strong>的实现规格。</p>
+      </div>
+
+      <p>任务分四个阶段：Research（worker 并行调查）→ <strong>Synthesis（coordinator 综合理解）</strong> → Implementation（worker 实现）→ Verification（worker 验证）。Synthesis 是 coordinator 存在的理由。</p>
+
+      <h2 id="tree">2. Agent Tree — 层级与分叉</h2>
+
+      <p>Claude Code 有一棵完整的 Agent 类型树：</p>
+
+      <table>
+        <tr><th>类型</th><th>特点</th><th>用途</th></tr>
+        <tr><td><strong>Explore</strong></td><td>只读，不能编辑文件</td><td>代码搜索、架构分析</td></tr>
+        <tr><td><strong>Plan</strong></td><td>只读</td><td>实现方案规划</td></tr>
+        <tr><td><strong>Verification</strong></td><td>独立对抗性验证（内部版）</td><td>证明代码能用，不是橡皮图章</td></tr>
+        <tr><td><strong>Fork</strong></td><td>继承父上下文，后台运行</td><td>研究、实现</td></tr>
+        <tr><td><strong>Custom</strong></td><td><code>.claude/agents/*.md</code></td><td>用户自定义</td></tr>
+        <tr><td><strong>Worker</strong></td><td>Coordinator 模式下的执行者</td><td>全工具集</td></tr>
+      </table>
+
+      <h3>Fork Subagent：最聪明的设计</h3>
+
+      <p>省略 <code>subagent_type</code> → 隐式分叉。子进程继承父进程的<strong>完整对话上下文和 system prompt</strong>。</p>
+
+      <p>精妙之处在于 <strong>prompt cache 优化</strong>：所有 fork 子进程的 tool_result 替换为相同占位符 <code>"Fork started — processing in background"</code>，确保不同子进程的 API 请求前缀<strong>字节完全相同</strong>，最大化缓存命中。</p>
+
+      <p>Fork 子进程有严格规则：</p>
+      <ul>
+        <li><strong>不能递归 fork</strong>（通过检测 <code>&lt;fork-boilerplate&gt;</code> 标签防止）</li>
+        <li><strong>不能偷看进度</strong>（不要 Read output_file）</li>
+        <li><strong>不能伪造结果</strong>（完成通知由系统生成，不是模型自己写的）</li>
+        <li>输出必须结构化：Scope → Result → Key files → Files changed → Issues</li>
+      </ul>
+
+      <h3>自定义 Agent 格式</h3>
+
+      <p>用 Markdown + frontmatter 定义，支持精细控制：</p>
+
+      <pre><code># .claude/agents/my-agent.md
+---
+description: "Code reviewer"
+tools: ["Read", "Bash", "Grep"]
+model: "inherit"
+permissionMode: "bubble"
+isolation: "worktree"
+maxTurns: 200
+memory: "project"
+---
+
+You are a code reviewer that...</code></pre>
+
+      <h2 id="mcp">3. Tool Server — MCP 双向桥接</h2>
+
+      <p>Claude Code 同时是 <strong>MCP server 和 MCP client</strong>。</p>
+
+      <h3>作为 Server</h3>
+
+      <p><code>claude-code mcp</code> 启动一个标准 MCP 服务器（名称 <code>claude/tengu</code>），通过 StdioTransport 暴露所有内部工具——Read、Edit、Write、Bash、Glob、Grep 等。其他 AI 工具可以直接调用 Claude Code 的能力。</p>
+
+      <h3>作为 Client</h3>
+
+      <p>连接外部 MCP server，获取额外工具和技能：</p>
+      <ul>
+        <li>MCP server 的 <code>instructions</code> 注入 system prompt</li>
+        <li>支持<strong>指令增量模式</strong>：MCP 指令通过 attachment 增量传递，避免连接/断开时破坏 prompt cache</li>
+        <li>MCP 工具可标记 <code>_meta['anthropic/alwaysLoad']</code> 跳过延迟加载</li>
+        <li>MCP server 可以提供 Skill（prompt 技能），被技能系统自动发现</li>
+      </ul>
+
+      <h2 id="skill">4. Skill System — 技能即 Prompt</h2>
+
+      <p>Skill 本质上是<strong>带 frontmatter 的 Markdown 文件</strong>，调用时展开为完整指令注入当前上下文。</p>
+
+      <h3>技能来源</h3>
+
+      <ul>
+        <li><strong>内置</strong>：/commit、/verify、/simplify、/debug、/remember、/stuck、/batch 等 13+ 个</li>
+        <li><strong>用户定义</strong>：<code>.claude/commands/*.md</code> 或 <code>~/.claude/commands/*.md</code></li>
+        <li><strong>MCP 提供</strong>：外部 MCP server 暴露的 prompt 技能</li>
+        <li><strong>动态发现</strong>：DiscoverSkillsTool 根据当前任务自动搜索（实验特性）</li>
+      </ul>
+
+      <h3>Skill vs Agent</h3>
+
+      <table>
+        <tr><th>维度</th><th>Skill</th><th>Agent</th></tr>
+        <tr><td>执行位置</td><td>主上下文内</td><td>子进程</td></tr>
+        <tr><td>上下文</td><td>共享主对话</td><td>独立/继承</td></tr>
+        <tr><td>并行</td><td>不能</td><td>可以</td></tr>
+        <tr><td>本质</td><td>Prompt 注入</td><td>独立推理循环</td></tr>
+      </table>
+
+      <h3>预算控制</h3>
+
+      <p>技能列表占 context window 的 <strong>1%</strong>（约 8000 字符）。每条描述最多 250 字符，超预算时 bundled 技能优先保留完整描述，其余截断。极端情况下只显示技能名。</p>
+
+      <h2 id="async">5. Async Tool — 后台执行</h2>
+
+      <p>"Async" 在 Claude Code 中有两个层面：</p>
+
+      <h3>层面 1：Bash <code>run_in_background</code></h3>
+
+      <p>命令立即返回，后台跑完后系统自动发 <code>&lt;task-notification&gt;</code>。<strong>不需要轮询、不需要 sleep、不需要 &amp;</strong>。适合构建、测试、部署等长时间任务。</p>
+
+      <h3>层面 2：Agent 后台模式</h3>
+
+      <p>Fork subagent <strong>始终后台运行</strong>，普通 agent 可选 <code>run_in_background: true</code>。Coordinator 模式下所有 worker 都是后台异步的。</p>
+
+      <h3>后台 Agent 工具白名单</h3>
+
+      <p>后台 Agent 不能用所有工具。被禁的：</p>
+      <ul>
+        <li><code>Agent</code> — 防递归</li>
+        <li><code>AskUserQuestion</code> — 后台不能弹交互</li>
+        <li><code>TaskStop</code> — 需要主线程状态</li>
+        <li><code>MCP 工具</code> — 尚未实现</li>
+      </ul>
+
+      <h2 id="sequential">6. Sequential Tool — 并行与顺序</h2>
+
+      <p>这不是一个独立系统，而是贯穿所有工具执行的<strong>编排策略</strong>。</p>
+
+      <h3>并行</h3>
+
+      <p>System prompt 明确指导："独立的工具调用放在同一条消息中并行执行。" 例如 <code>git status</code> + <code>git diff</code> 可以并行，多个研究 agent 可以并行启动。</p>
+
+      <h3>顺序</h3>
+
+      <p>"有依赖的工具调用必须顺序执行。" 例如先 Read 再 Edit，先 commit 再 status。Bash 中用 <code>&&</code> 串联有依赖的命令。</p>
+
+      <h3>并发安全</h3>
+
+      <p>每个工具定义 <code>isConcurrencySafe(input)</code>，返回 false 的工具系统会强制串行。对同一文件的两个 Edit 不是并发安全的。</p>
+
+      <p>Coordinator 层面的策略更清晰：</p>
+      <ul>
+        <li><strong>Research</strong>（只读）→ 自由并行</li>
+        <li><strong>Implementation</strong>（写）→ 同一文件集一次一个</li>
+        <li><strong>Verification</strong> → 可与不同文件区域的 implementation 并行</li>
+      </ul>
+
+      <h2 id="harness">7. Harness — 运行时框架</h2>
+
+      <p>Harness 是连接 AI 推理和工具执行的<strong>中间层</strong>，是整个系统的"壳"。</p>
+
+      <h3>Prompt Cache 管理</h3>
+
+      <p>这是 harness 最精妙的部分。System prompt 分为<strong>静态和动态两部分</strong>，用 <code>SYSTEM_PROMPT_DYNAMIC_BOUNDARY</code> 分隔：</p>
+
+      <pre><code>[Static — cacheScope: 'global', 跨用户/跨组织共享]
+  Intro → System rules → Doing Tasks
+  → Actions → Using Tools → Tone → Output
+[=== BOUNDARY (Blake2b hash) ===]
+[Dynamic — 每轮可变]
+  Session guidance → Memory → Env info
+  → Language → MCP → Scratchpad</code></pre>
+
+      <p>设计目标：静态部分<strong>字节完全相同</strong>才能命中全局缓存。所以任何运行时条件判断（如 agent list、MCP 连接状态）都必须放在动态部分——否则会指数级增加缓存变体（2^N 问题）。</p>
+
+      <h3>上下文自动压缩</h3>
+
+      <p>对话接近上下文限制时自动压缩历史消息。模型被告知 "write down important information" 因为旧的 tool results 可能被清除（Cached MicroCompact 特性）。理论上<strong>上下文无限</strong>。</p>
+
+      <h3>工具延迟加载</h3>
+
+      <p>不是所有工具都在第一轮就展开 schema——核心工具（Read、Edit、Bash）始终加载，其余通过 <code>ToolSearch</code> 按需加载。减少初始 prompt 大小。</p>
+
+      <h3>Claude Code Hints 协议</h3>
+
+      <p>Harness 扫描 Bash 输出中的特殊标签：</p>
+
+      <pre><code>&lt;claude-code-hint v="1" type="plugin"
+  value="eslint@marketplace" /&gt;</code></pre>
+
+      <p>标签从输出中<strong>剥离</strong>（模型看不到），harness 解析后弹出安装提示。纯侧通道，不经过 AI 推理。</p>
+
+      <h3>其他 Harness 职责</h3>
+      <ul>
+        <li><strong>权限系统</strong>：sandbox 沙箱（文件系统 + 网络白名单）、权限冒泡（bubble）、中断行为（cancel/block）</li>
+        <li><strong>Interrupt Behavior</strong>：用户发新消息时，工具可选择取消或继续</li>
+        <li><strong>System Reminder</strong>：<code>&lt;system-reminder&gt;</code> 标签在 tool result 中注入系统信息</li>
+        <li><strong>Hook 系统</strong>：shell 命令响应事件（如 tool call 前后），反馈等同于用户输入</li>
+      </ul>
+
+      <h2>Bonus：内部版 vs 外部版</h2>
+
+      <p>源码中 <code>process.env.USER_TYPE === 'ant'</code> 区分 Anthropic 内部版和公开版，差异很大：</p>
+
+      <table>
+        <tr><th>维度</th><th>内部版 (ant)</th><th>外部版</th></tr>
+        <tr><td>沟通风格</td><td>散文体、倒金字塔、≤25 词/≤100 词</td><td>"be concise" 一句话</td></tr>
+        <tr><td>注释哲学</td><td>默认不写，只写 WHY 不明显的</td><td>无规定</td></tr>
+        <tr><td>诚实报告</td><td>禁止谎报测试结果</td><td>无</td></tr>
+        <tr><td>验证 Agent</td><td>3+ 文件改动必须独立验证</td><td>无</td></tr>
+        <tr><td>Explore 模型</td><td>inherit（Opus）</td><td>Haiku</td></tr>
+        <tr><td>Agent 嵌套</td><td>允许</td><td>禁止</td></tr>
+        <tr><td>Agent 隔离</td><td>worktree + remote</td><td>仅 worktree</td></tr>
+        <tr><td>Undercover</td><td>隐藏未发布模型名</td><td>无</td></tr>
+      </table>
+
+      <h2>启发</h2>
+
+      <p>读完整个源码，几个印象最深的设计决策：</p>
+
+      <ol>
+        <li><strong>Cache 是一等公民</strong>。从 static/dynamic 边界到 fork 占位符到 MCP 指令增量，所有设计都在保护 prompt cache。这是成本控制的核心。</li>
+        <li><strong>Coordinator 模式是多 agent 的答案</strong>。不让一个 agent 既思考又干活。分开后 coordinator 专注综合，worker 专注执行，质量显著提升。</li>
+        <li><strong>"Never delegate understanding"</strong>——这句话值得刻在每个 agent 开发者的桌上。最常见的多 agent 失败模式就是把理解外包出去。</li>
+        <li><strong>Fork 的 prompt cache 共享</strong>是一个非常工程化的创新。同一段上下文被多个子进程复用，边际成本几乎为零。</li>
+        <li><strong>内部版比外部版严格得多</strong>。Anthropic 自己用的是"不能撒谎、不能偷懒、必须验证"的版本。这说明他们知道模型的弱点在哪。</li>
+      </ol>
+
+      <p>Claude Code 不是一个 CLI 工具。它是一个 <strong>agent operating system</strong>。</p>
+
+    </div>
+
+    <div class="post-nav">
+      <a href="/posts/harness-design-long-running-apps.html">← Harness 设计</a>
+      <a href="/">首页 →</a>
+    </div>
+
+    <footer class="footer">
+      <p>Ming · 2026</p>
+    </footer>
+  </div>
+</body>
+</html>
